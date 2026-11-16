@@ -1,0 +1,53 @@
+# Base Dockerfile template for all Spring Boot services
+# Multi-stage build: Build stage + Runtime stage
+
+# ============================================
+# Stage 1: BUILD
+# ============================================
+FROM maven:3.9-eclipse-temurin-21-alpine AS build
+
+WORKDIR /app
+
+# Copy parent pom and common module first (better caching)
+COPY pom.xml .
+COPY gymstore-common ./gymstore-common
+
+# Copy service-specific files
+ARG SERVICE_NAME
+COPY ${SERVICE_NAME}/pom.xml ./${SERVICE_NAME}/
+
+# Download dependencies (cached if pom.xml unchanged)
+RUN mvn dependency:go-offline -pl ${SERVICE_NAME} -am
+
+# Copy source code
+COPY ${SERVICE_NAME}/src ./${SERVICE_NAME}/src
+
+# Build the service
+RUN mvn clean package -pl ${SERVICE_NAME} -am -DskipTests
+
+# ============================================
+# Stage 2: RUNTIME
+# ============================================
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+# Install curl for healthchecks
+RUN apk add --no-cache curl
+
+# Copy jar from build stage
+ARG SERVICE_NAME
+COPY --from=build /app/${SERVICE_NAME}/target/*.jar app.jar
+
+# Create non-root user
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+# Expose port (will be overridden in docker-compose)
+EXPOSE 8080
+
+# Spring Boot will use this profile
+ENV SPRING_PROFILES_ACTIVE=docker
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]

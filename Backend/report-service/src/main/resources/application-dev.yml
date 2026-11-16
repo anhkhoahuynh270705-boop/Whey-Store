@@ -1,0 +1,51 @@
+# Report Service - Development Configuration (Read-only access to multiple DBs)
+spring:
+  config:
+    import:
+      - optional:file:../../config/infrastructure-config.yml
+      - optional:file:../../config/service-urls.yml
+
+  # Primary datasource (can be configured as read-replica in production)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      read-only: true
+
+  jpa:
+    open-in-view: false
+    show-sql: true
+    properties:
+      hibernate:
+        jdbc.time_zone: Asia/Ho_Chi_Minh
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/gymstore
+
+server:
+  port: 8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.gymstore: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG

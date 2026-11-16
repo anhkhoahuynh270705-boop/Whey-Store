@@ -1,0 +1,155 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goList()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1><i class="fas fa-box"></i> Chi tiết sản phẩm</h1>
+        <span class="breadcrumb">
+          <span class="crumb-link" (click)="goList()">Sản phẩm</span>
+          / {{ product?.name ?? '...' }}
+        </span>
+      </div>
+    </div>
+    @if (product) {
+      <div class="header-actions">
+        <button class="btn-edit" (click)="goEdit()">
+          <i class="fas fa-edit"></i> Chỉnh sửa
+        </button>
+        <button class="btn-delete" (click)="deleteProduct()">
+          <i class="fas fa-trash-alt"></i> Xoá
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (loading) {
+    <div class="page-loading">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...
+    </div>
+  } @else if (errorMsg) {
+    <div class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
+    </div>
+  } @else if (product) {
+    <div class="detail-layout">
+
+      <!-- Left: Images -->
+      <div class="detail-col img-col">
+        <div class="form-card">
+          <div class="main-image">
+            @if (selectedImage) {
+              <img [src]="selectedImage" [alt]="product.name" />
+            } @else {
+              <div class="no-image"><i class="fas fa-image"></i></div>
+            }
+          </div>
+          @if (product.images && product.images.length > 1) {
+            <div class="thumb-row">
+              @for (img of product.images; track img.id) {
+                <img
+                  [src]="img.imageUrl"
+                  [class.selected]="img.imageUrl === selectedImage"
+                  (click)="selectImage(img.imageUrl)"
+                  class="thumb"
+                  alt="" />
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right: Info -->
+      <div class="detail-col info-col">
+
+        <!-- Status + badge -->
+        <div class="form-card name-card">
+          <div class="product-status">
+            <span [class]="product.status === 'ACTIVE' ? 'status-badge active' : 'status-badge inactive'">
+              {{ product.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn' }}
+            </span>
+            <span class="product-id">ID: #{{ product.id }}</span>
+          </div>
+          <h2 class="product-name">{{ product.name }}</h2>
+          <div class="meta-row">
+            <span class="meta-item">
+              <i class="fas fa-th-list"></i> {{ product.categoryName }}
+            </span>
+            <span class="meta-item">
+              <i class="fas fa-shield-alt"></i> {{ product.brandName }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="form-card">
+          <div class="card-title"><i class="fas fa-tag"></i> Giá bán</div>
+          <div class="price-row">
+            <div class="price-box">
+              <div class="price-label">Giá gốc</div>
+              <div class="price-value">{{ formatPrice(product.price) }}</div>
+            </div>
+            @if (product.salePrice) {
+              <div class="price-box sale">
+                <div class="price-label">Giá KM</div>
+                <div class="price-value sale-color">{{ formatPrice(product.salePrice) }}</div>
+              </div>
+              <div class="price-box">
+                <div class="price-label">Giảm</div>
+                <div class="price-value discount-color">
+                  -{{ ((1 - product.salePrice / product.price) * 100).toFixed(0) }}%
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Specs -->
+        <div class="form-card">
+          <div class="card-title"><i class="fas fa-flask"></i> Thông số</div>
+          <div class="spec-grid">
+            @if (product.weightGrams) {
+              <div class="spec-item">
+                <span class="spec-label"><i class="fas fa-weight"></i> Khối lượng</span>
+                <span class="spec-value">{{ product.weightGrams }}g</span>
+              </div>
+            }
+            @if (product.flavor) {
+              <div class="spec-item">
+                <span class="spec-label"><i class="fas fa-candy-cane"></i> Hương vị</span>
+                <span class="spec-value">{{ product.flavor }}</span>
+              </div>
+            }
+            @if (product.servingSize) {
+              <div class="spec-item">
+                <span class="spec-label"><i class="fas fa-utensils"></i> Số lần dùng</span>
+                <span class="spec-value">{{ product.servingSize }} lần</span>
+              </div>
+            }
+            <div class="spec-item">
+              <span class="spec-label"><i class="fas fa-calendar-alt"></i> Ngày tạo</span>
+              <span class="spec-value">{{ formatDate(product.createdAt) }}</span>
+            </div>
+            <div class="spec-item">
+              <span class="spec-label"><i class="fas fa-sync-alt"></i> Cập nhật</span>
+              <span class="spec-value">{{ formatDate(product.updatedAt) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        @if (product.description) {
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-align-left"></i> Mô tả sản phẩm</div>
+            <div class="description-text">{{ product.description }}</div>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+</div>
+

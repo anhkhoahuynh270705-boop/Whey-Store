@@ -1,0 +1,173 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="cancel()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1><i class="fas fa-plus-circle"></i> Thêm sản phẩm mới</h1>
+        <span class="breadcrumb">Sản phẩm / Tạo mới</span>
+      </div>
+    </div>
+  </div>
+
+  @if (initLoading) {
+    <div class="page-loading"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (errorMsg) {
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
+        </div>
+      }
+      @if (successMsg) {
+        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
+      }
+
+      <div class="form-layout">
+        <div class="form-col main-col">
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-info-circle"></i> Thông tin cơ bản</div>
+            <div class="form-group">
+              <label>Tên sản phẩm <span class="req">*</span></label>
+              <input
+                type="text"
+                formControlName="name"
+                placeholder="VD: Whey Protein Gold Standard 2lbs"
+              />
+              @if (f('name')?.invalid && f('name')?.touched) {
+                <span class="field-error"
+                  >Tên sản phẩm không được để trống (tối thiểu 2 ký tự)</span
+                >
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Danh mục <span class="req">*</span></label>
+                <select formControlName="categoryId">
+                  <option [ngValue]="null" disabled>-- Chọn danh mục --</option>
+                  @for (c of categories; track c.id) {
+                    <option [ngValue]="c.id">{{ c.name }}</option>
+                  }
+                </select>
+                @if (f('categoryId')?.invalid && f('categoryId')?.touched) {
+                  <span class="field-error">Vui lòng chọn danh mục</span>
+                }
+              </div>
+              <div class="form-group">
+                <label>Thương hiệu <span class="req">*</span></label>
+                <select formControlName="brandId">
+                  <option [ngValue]="null" disabled>-- Chọn thương hiệu --</option>
+                  @for (b of brands; track b.id) {
+                    <option [ngValue]="b.id">{{ b.name }}</option>
+                  }
+                </select>
+                @if (f('brandId')?.invalid && f('brandId')?.touched) {
+                  <span class="field-error">Vui lòng chọn thương hiệu</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Mô tả</label>
+              <textarea
+                formControlName="description"
+                rows="5"
+                placeholder="Nhập mô tả chi tiết về sản phẩm..."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Pricing card -->
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-tag"></i> Giá bán</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Giá gốc (₫) <span class="req">*</span></label>
+                <input type="number" formControlName="price" placeholder="VD: 850000" min="0" />
+                @if (f('price')?.invalid && f('price')?.touched) {
+                  <span class="field-error">Giá không hợp lệ</span>
+                }
+              </div>
+              <div class="form-group">
+                <label>Giá khuyến mãi (₫)</label>
+                <input
+                  type="number"
+                  formControlName="salePrice"
+                  placeholder="Để trống nếu không có"
+                  min="0"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Specs card -->
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-flask"></i> Thông số sản phẩm</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Khối lượng (g)</label>
+                <input type="number" formControlName="weightGrams" placeholder="VD: 907" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Hương vị</label>
+                <input
+                  type="text"
+                  formControlName="flavor"
+                  placeholder="VD: Chocolate, Vanilla..."
+                />
+              </div>
+              <div class="form-group">
+                <label>Số lần dùng</label>
+                <input type="number" formControlName="servingSize" placeholder="VD: 30" min="0" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div class="form-col side-col">
+          <!-- Status card -->
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-toggle-on"></i> Trạng thái</div>
+            <div class="form-group">
+              <select formControlName="status">
+                <option value="ACTIVE">✅ Hoạt động (hiển thị)</option>
+                <option value="INACTIVE">🔴 Ẩn (không hiển thị)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Image card -->
+          <div class="form-card">
+            <div class="card-title"><i class="fas fa-image"></i> Ảnh sản phẩm</div>
+            <div class="form-group">
+              <label>URL ảnh chính</label>
+              <input type="url" formControlName="imageUrl" placeholder="https://..." />
+            </div>
+            @if (f('imageUrl')?.value) {
+              <div class="img-preview">
+                <img [src]="f('imageUrl')?.value" alt="Preview" />
+              </div>
+            }
+          </div>
+
+          <!-- Actions card -->
+          <div class="form-card action-card">
+            <button type="submit" class="btn-submit" [disabled]="loading">
+              @if (loading) {
+                <i class="fas fa-spinner fa-spin"></i> Đang tạo...
+              } @else {
+                <i class="fas fa-plus"></i> Tạo sản phẩm
+              }
+            </button>
+            <button type="button" class="btn-cancel" (click)="cancel()" [disabled]="loading">
+              <i class="fas fa-times"></i> Huỷ
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  }
+</div>

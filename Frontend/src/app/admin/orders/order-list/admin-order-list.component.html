@@ -1,0 +1,62 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý đơn hàng</h1>
+    <span class="text-muted small">{{ data?.totalElements ?? 0 }} đơn</span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="toolbar-title">Tất cả đơn hàng</span>
+      <div class="toolbar-actions">
+        <select [(ngModel)]="filterStatus" style="max-width: 160px">
+          <option value="">Tất cả trạng thái</option>
+          @for (s of statusOptions.slice(1); track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    @if (loading) {
+      <div class="loading-state">Đang tải...</div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>User ID</th>
+              <th class="td-right">Tổng tiền</th>
+              <th class="td-center">Trạng thái</th>
+              <th>Ngày đặt</th>
+              <th class="td-center">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (o of filtered; track o.id) {
+              <tr>
+                <td class="td-primary">{{ o.orderNumber }}</td>
+                <td class="td-mono">{{ o.userId.substring(0, 10) }}...</td>
+                <td class="td-price td-right">{{ formatPrice(o.totalAmount) }}</td>
+                <td class="td-center">
+                  <span [class]="statusClass(o.status)">{{ o.status }}</span>
+                </td>
+                <td class="td-muted">{{ formatDate(o.createdAt) }}</td>
+                <td class="td-center">
+                  <div class="action-group">
+                    <a
+                      [routerLink]="['/orders', o.id]"
+                      class="action-btn detail"
+                      title="Xem chi tiết"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

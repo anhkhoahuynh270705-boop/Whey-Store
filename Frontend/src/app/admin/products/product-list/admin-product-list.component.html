@@ -1,0 +1,106 @@
+<div class="admin-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1><i class="fas fa-box-open"></i> Quản lý sản phẩm</h1>
+      <span class="text-muted small">{{ data?.totalElements ?? 0 }} sản phẩm</span>
+    </div>
+    <button class="btn btn-create" (click)="goCreate()">
+      <i class="fas fa-plus"></i> Thêm sản phẩm
+    </button>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="toolbar-title">Danh sách sản phẩm</span>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" placeholder="Tìm sản phẩm..." [(ngModel)]="search" />
+      </div>
+    </div>
+
+    @if (loading) {
+      <div class="loading-state"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>
+    } @else if (filtered.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon"><i class="fas fa-box-open"></i></span>
+        <span class="empty-title">Không tìm thấy sản phẩm</span>
+        <button class="btn btn-create mt-2" (click)="goCreate()">
+          <i class="fas fa-plus"></i> Thêm ngay
+        </button>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="col-img">Ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Thương hiệu</th>
+              <th class="td-price">Giá bán</th>
+              <th class="td-price">Giá KM</th>
+              <th class="td-center">Trạng thái</th>
+              <th class="td-center col-actions">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of filtered; track p.id) {
+              <tr>
+                <td class="col-img">
+                  @if (p.primaryImage) {
+                    <img [src]="p.primaryImage" [alt]="p.name" class="product-thumb" />
+                  } @else {
+                    <div class="no-img"><i class="fas fa-image"></i></div>
+                  }
+                </td>
+                <td>
+                  <div class="td-primary">{{ p.name }}</div>
+                  <div class="td-mono">{{ p.categoryName }}</div>
+                </td>
+                <td>{{ p.brandName }}</td>
+                <td class="td-price">{{ formatPrice(p.price) }}</td>
+                <td class="td-price">
+                  @if (p.salePrice) {
+                    <span class="sale-price">{{ formatPrice(p.salePrice) }}</span>
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="td-center">
+                  <button
+                    class="status-badge"
+                    [class.active]="p.status === 'ACTIVE'"
+                    [class.inactive]="p.status !== 'ACTIVE'"
+                    [disabled]="togglingId === p.id"
+                    (click)="toggleStatus(p)"
+                    title="Click để đổi trạng thái"
+                  >
+                    @if (togglingId === p.id) {
+                      <i class="fas fa-spinner fa-spin"></i>
+                    } @else {
+                      {{ p.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn' }}
+                    }
+                  </button>
+                </td>
+                <td class="td-center">
+                  <div class="action-group">
+                    <button class="action-btn detail" (click)="goDetail(p.id)" title="Xem chi tiết">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="action-btn edit" (click)="goEdit(p.id)" title="Chỉnh sửa">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" (click)="deleteProduct(p.id)" title="Xoá">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

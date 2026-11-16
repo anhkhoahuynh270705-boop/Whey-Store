@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- BÁO CÁO DOANH THU theo khoảng ngày – Group by date -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="revenue" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="782" leftMargin="30" rightMargin="30"
+              topMargin="20" bottomMargin="20">
+
+  <parameter name="DATE_FROM" class="java.sql.Date"/>
+  <parameter name="DATE_TO" class="java.sql.Date"/>
+  <parameter name="REPORT_TITLE" class="java.lang.String"/>
+
+  <queryString>
+    <![CDATA[
+      SELECT
+        DATE(o.order_date) AS ngay,
+        COUNT(*) AS so_don,
+        SUM(o.total_amount) AS doanh_thu
+      FROM order_facts o
+      WHERE o.status = 'COMPLETED'
+        AND DATE(o.order_date) BETWEEN $P{DATE_FROM} AND $P{DATE_TO}
+      GROUP BY DATE(o.order_date)
+      ORDER BY ngay
+    ]]>
+  </queryString>
+
+  <field name="ngay" class="java.sql.Date"/>
+  <field name="so_don" class="java.lang.Long"/>
+  <field name="doanh_thu" class="java.math.BigDecimal"/>
+
+  <variable name="TOTAL_REVENUE" class="java.math.BigDecimal" calculation="Sum">
+    <variableExpression><![CDATA[$F{doanh_thu}]]></variableExpression>
+  </variable>
+
+  <title>
+    <band height="60">
+      <textField><reportElement x="0" y="0" width="782" height="40"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="18" isBold="true"/></textElement>
+        <textFieldExpression><![CDATA[$P{REPORT_TITLE}]]></textFieldExpression></textField>
+      <textField pattern="dd/MM/yyyy">
+        <reportElement x="600" y="42" width="182" height="18"/>
+        <textElement textAlignment="Right"><font fontName="DejaVu Sans" size="10" isItalic="true"/></textElement>
+        <textFieldExpression><![CDATA["Xuất ngày " + new java.util.Date()]]></textFieldExpression>
+      </textField>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="28">
+      <staticText><reportElement x="0" y="0" width="300" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Ngày]]></text></staticText>
+      <staticText><reportElement x="300" y="0" width="241" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Số đơn hoàn tất]]></text></staticText>
+      <staticText><reportElement x="541" y="0" width="241" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Doanh thu (₫)]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="22">
+      <textField pattern="dd/MM/yyyy"><reportElement x="0" y="0" width="300" height="22"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{ngay}]]></textFieldExpression></textField>
+      <textField><reportElement x="300" y="0" width="241" height="22"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{so_don}]]></textFieldExpression></textField>
+      <textField pattern="#,##0"><reportElement x="541" y="0" width="241" height="22"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{doanh_thu}]]></textFieldExpression></textField>
+    </band>
+  </detail>
+
+  <summary>
+    <band height="40">
+      <staticText><reportElement x="0" y="8" width="541" height="28"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="13" isBold="true"/></textElement>
+        <text><![CDATA[TỔNG DOANH THU:  ]]></text></staticText>
+      <textField pattern="#,##0 ₫"><reportElement x="541" y="8" width="241" height="28"/>
+        <textElement textAlignment="Right" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="14" isBold="true" forecolor="#FF5500"/></textElement>
+        <textFieldExpression><![CDATA[$V{TOTAL_REVENUE}]]></textFieldExpression></textField>
+    </band>
+  </summary>
+</jasperReport>

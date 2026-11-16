@@ -1,0 +1,14 @@
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\mapper\EmailMapper.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\exception\BusinessException.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\exception\code\NotificationErrorCode.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\entity\EmailLog.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\config\SecurityConfig.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\config\KafkaConsumerConfig.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\exception\IErrorCode.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\enums\EmailStatus.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\consumer\OrderEventConsumer.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\service\impl\EmailServiceImpl.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\exception\GlobalExceptionHandler.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\NotificationServiceApplication.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\service\IEmailService.java
+D:\Project\Whey-store\Backend\notification-service\src\main\java\com\gymstore\notification\repository\EmailLogRepository.java

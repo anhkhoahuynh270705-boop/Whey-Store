@@ -1,0 +1,36 @@
+# Notification Service - Development Configuration (Kafka-based, no PostgreSQL)
+spring:
+  config:
+    import:
+      - optional:file:../../config/infrastructure-config.yml
+      - optional:file:../../config/service-urls.yml
+
+  # Notification service uses Kafka only, no database
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/gymstore
+
+server:
+  port: 8087
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.gymstore: DEBUG
+    org.springframework.kafka: DEBUG

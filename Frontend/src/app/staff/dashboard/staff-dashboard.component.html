@@ -1,0 +1,67 @@
+<div class="staff-page">
+  <div class="page-header">
+    <h1>Dashboard nhân viên</h1>
+    <span class="text-muted small">Cần xử lý hôm nay</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-clock"></i></span>
+      <div class="stat-value">{{ stats.pending }}</div>
+      <div class="stat-label">Chờ xử lý</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-lock"></i></span>
+      <div class="stat-value">{{ stats.reserved }}</div>
+      <div class="stat-label">Đã giữ hàng</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-check-circle"></i></span>
+      <div class="stat-value">{{ stats.completed }}</div>
+      <div class="stat-label">Hoàn thành</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon"><i class="fas fa-boxes"></i></span>
+      <div class="stat-value">{{ stats.inventory }}</div>
+      <div class="stat-label">Mặt hàng kho</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="toolbar-title">Đơn cần xử lý</span>
+      <a routerLink="/orders" class="btn btn-sm">Xem tất cả đơn →</a>
+    </div>
+    @if (loading) {
+      <div class="loading-state">Đang tải...</div>
+    } @else if (pendingOrders.length === 0) {
+      <div class="empty-state">
+        <span class="empty-icon"><i class="fas fa-check-double"></i></span>
+        <span class="empty-title">Không có đơn chờ xử lý</span>
+      </div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr>
+            <th>Mã đơn</th>
+            <th class="td-right">Tổng tiền</th>
+            <th class="td-center">Trạng thái</th>
+            <th>Ngày đặt</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            @for (o of pendingOrders; track o.id) {
+              <tr>
+                <td class="td-primary">{{ o.orderNumber }}</td>
+                <td class="td-price td-right">{{ formatPrice(o.totalAmount) }}</td>
+                <td class="td-center"><span [class]="statusClass(o.status)">{{ o.status }}</span></td>
+                <td class="td-muted">{{ formatDate(o.createdAt) }}</td>
+                <td><a [routerLink]="['/orders', o.id]" class="btn btn-sm">Xử lý</a></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

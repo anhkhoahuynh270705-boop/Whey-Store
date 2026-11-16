@@ -1,0 +1,223 @@
+@if (loading) {
+  <div class="container loading-page">
+    <div class="loading-row">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...
+    </div>
+  </div>
+}
+
+@if (product && !loading) {
+  <div class="container product-detail">
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+      <a routerLink="/home"><i class="fas fa-home"></i></a>
+      <i class="fas fa-chevron-right sep"></i>
+      <a routerLink="/products">Sản phẩm</a>
+      <i class="fas fa-chevron-right sep"></i>
+      <span>{{ product.name }}</span>
+    </div>
+
+    <!-- ===== TOP: Images + Info ===== -->
+    <div class="product-top">
+
+      <!-- LEFT: Gallery -->
+      <div class="gallery-col">
+        <!-- Thumbnails dọc bên trái -->
+        @if (product.images.length > 1) {
+          <div class="thumb-col">
+            @for (img of product.images; track img.id) {
+              <button class="thumb" [class.active]="img.imageUrl === selectedImage"
+                      (click)="selectedImage = img.imageUrl">
+                <img [src]="img.imageUrl" [alt]="product.name" />
+              </button>
+            }
+          </div>
+        }
+        <!-- Ảnh chính -->
+        <div class="main-image" [class.zoomed]="zoomed" (click)="zoomed = !zoomed">
+          <img [src]="selectedImage || 'https://placehold.co/500x500/111820/ff6b1a?text=GymStore'"
+               [alt]="product.name" />
+          <div class="zoom-hint"><i class="fas fa-search-plus"></i></div>
+          @if (product.salePrice) {
+            <div class="sale-badge">SALE</div>
+          }
+        </div>
+      </div>
+
+      <!-- RIGHT: Purchase Panel -->
+      <div class="purchase-col">
+        <!-- Brand + Category -->
+        <div class="product-meta">
+          <span class="meta-brand"><i class="fas fa-trademark"></i> {{ product.brandName }}</span>
+          <span class="meta-sep">·</span>
+          <span class="meta-cat"><i class="fas fa-th-list"></i> {{ product.categoryName }}</span>
+        </div>
+
+        <!-- Tên sản phẩm -->
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Giá -->
+        <div class="price-panel">
+          @if (product.salePrice) {
+            <span class="price-sale">{{ formatPrice(product.salePrice) }}</span>
+            <span class="price-orig">{{ formatPrice(product.price) }}</span>
+            <span class="discount-tag">
+              -{{ ((1 - product.salePrice / product.price) * 100) | number:'1.0-0' }}%
+            </span>
+          } @else {
+            <span class="price-sale">{{ formatPrice(product.price) }}</span>
+          }
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Hương vị (chip select) -->
+        @if (product.flavor) {
+          <div class="option-row">
+            <span class="option-label">Hương vị</span>
+            <div class="option-chips">
+              <button class="chip active">{{ product.flavor }}</button>
+            </div>
+          </div>
+        }
+
+        <!-- Khối lượng (chip select) -->
+        @if (product.weightGrams) {
+          <div class="option-row">
+            <span class="option-label">Khối lượng</span>
+            <div class="option-chips">
+              <button class="chip active">{{ product.weightGrams >= 1000 ? (product.weightGrams / 1000 | number:'1.0-1') + ' kg' : product.weightGrams + ' g' }}</button>
+            </div>
+          </div>
+        }
+
+        <!-- Số lần dùng -->
+        @if (product.servingSize) {
+          <div class="option-row">
+            <span class="option-label">Số lần dùng</span>
+            <div class="option-chips">
+              <button class="chip active">{{ product.servingSize }} servings</button>
+            </div>
+          </div>
+        }
+
+        <div class="divider"></div>
+
+        <!-- Số lượng -->
+        <div class="qty-row" [formGroup]="addToCartForm">
+          <span class="option-label">Số lượng</span>
+          <div class="qty-ctrl">
+            <button class="qty-btn" type="button"
+                    (click)="decQty()"
+                    [disabled]="addToCartForm.get('quantity')!.value <= 1">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input type="number" formControlName="quantity" min="1" max="99" class="qty-input" />
+            <button class="qty-btn" type="button" (click)="incQty()">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- CTA Buttons -->
+        @if (product.status === 'ACTIVE') {
+          <div class="cta-row">
+            <button class="btn btn-cart" (click)="addToCart()" [disabled]="addToCartForm.invalid">
+              <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+            </button>
+            <button class="btn btn-buy" (click)="addToCart()" [disabled]="addToCartForm.invalid">
+              <i class="fas fa-bolt"></i> Mua ngay
+            </button>
+          </div>
+          @if (addedMsg) {
+            <div class="success-msg">
+              <i class="fas fa-check-circle"></i> Đã thêm vào giỏ hàng!
+            </div>
+          }
+        } @else {
+          <div class="out-of-stock">
+            <i class="fas fa-times-circle"></i> Hết hàng — tạm thời không có sẵn
+          </div>
+        }
+
+        <!-- Trust badges -->
+        <div class="trust-row">
+          <div class="trust-item"><i class="fas fa-certificate"></i><span>Chính hãng 100%</span></div>
+          <div class="trust-item"><i class="fas fa-shipping-fast"></i><span>Giao nhanh 2h</span></div>
+          <div class="trust-item"><i class="fas fa-undo"></i><span>Đổi trả 30 ngày</span></div>
+          <div class="trust-item"><i class="fas fa-shield-alt"></i><span>Bảo hành chính hãng</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== BOTTOM: Description + Specs ===== -->
+    <div class="product-bottom">
+
+      <!-- Thông số sản phẩm -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-list-alt"></i> Thông số sản phẩm
+        </div>
+        <div class="spec-table">
+          <div class="spec-row">
+            <span class="spec-key">Thương hiệu</span>
+            <span class="spec-val">{{ product.brandName }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Danh mục</span>
+            <span class="spec-val">{{ product.categoryName }}</span>
+          </div>
+          @if (product.flavor) {
+            <div class="spec-row">
+              <span class="spec-key">Hương vị</span>
+              <span class="spec-val">{{ product.flavor }}</span>
+            </div>
+          }
+          @if (product.weightGrams) {
+            <div class="spec-row">
+              <span class="spec-key">Khối lượng tịnh</span>
+              <span class="spec-val">
+                {{ product.weightGrams >= 1000 ? (product.weightGrams / 1000 | number:'1.0-2') + ' kg' : product.weightGrams + ' g' }}
+              </span>
+            </div>
+          }
+          @if (product.servingSize) {
+            <div class="spec-row">
+              <span class="spec-key">Số lần dùng (servings)</span>
+              <span class="spec-val">{{ product.servingSize }}</span>
+            </div>
+          }
+          <div class="spec-row">
+            <span class="spec-key">Xuất xứ</span>
+            <span class="spec-val">Chính hãng nhập khẩu</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key">Trạng thái</span>
+            <span class="spec-val">
+              @if (product.status === 'ACTIVE') {
+                <span class="status-badge in-stock"><i class="fas fa-check-circle"></i> Còn hàng</span>
+              } @else {
+                <span class="status-badge out"><i class="fas fa-times-circle"></i> Hết hàng</span>
+              }
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mô tả sản phẩm -->
+      @if (product.description) {
+        <div class="info-card">
+          <div class="info-card-header">
+            <i class="fas fa-align-left"></i> Mô tả sản phẩm
+          </div>
+          <div class="desc-body">
+            <p>{{ product.description }}</p>
+          </div>
+        </div>
+      }
+
+    </div>
+
+  </div>
+}

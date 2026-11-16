@@ -1,0 +1,97 @@
+@if (loading) {
+  <div class="container loading-row" style="padding: 60px 0">
+    <i class="fas fa-spinner fa-spin"></i> Đang tải đơn hàng...
+  </div>
+}
+
+@if (order) {
+  <div class="container order-detail-page">
+
+    <!-- Header -->
+    <div class="order-header">
+      <div class="order-title-wrap">
+        <a routerLink="/orders" class="back-btn">
+          <i class="fas fa-arrow-left"></i>
+        </a>
+        <h1>
+          <i class="fas fa-box"></i>
+          Đơn hàng #{{ order.orderNumber }}
+        </h1>
+      </div>
+      @if (order.status === 'COMPLETED') {
+        <button class="btn btn-sm btn-ghost" (click)="downloadInvoice()">
+          <i class="fas fa-file-pdf"></i> Tải hóa đơn PDF
+        </button>
+      }
+    </div>
+
+    <!-- Info Grid -->
+    <div class="card info-grid">
+      <div class="info-cell">
+        <span class="info-label"><i class="fas fa-info-circle"></i> Trạng thái</span>
+        <span>
+          <span [class]="statusBadge(order.status)">
+            <i [class]="statusIcon(order.status)"></i>
+            {{ order.status }}
+          </span>
+        </span>
+      </div>
+      <div class="info-cell">
+        <span class="info-label"><i class="fas fa-credit-card"></i> Thanh toán</span>
+        <span class="info-value">{{ order.paymentMethod }}</span>
+      </div>
+      <div class="info-cell">
+        <span class="info-label"><i class="fas fa-calendar-alt"></i> Ngày đặt</span>
+        <span class="info-value">{{ formatDate(order.createdAt) }}</span>
+      </div>
+      <div class="info-cell">
+        <span class="info-label"><i class="fas fa-map-marker-alt"></i> Địa chỉ</span>
+        <span class="info-value">{{ order.shippingAddress }}</span>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="card items-card">
+      <h3><i class="fas fa-boxes"></i> Sản phẩm</h3>
+      <div class="items-list">
+        @for (item of order.items; track item.productId) {
+          <div class="order-item">
+            <div class="item-name-wrap">
+              <i class="fas fa-cube item-dot"></i>
+              <span>{{ item.productName }} <span class="text-muted small">× {{ item.quantity }}</span></span>
+            </div>
+            <span class="price item-subtotal">{{ formatPrice(item.subtotal) }}</span>
+          </div>
+        }
+      </div>
+      <div class="order-total">
+        <span><i class="fas fa-calculator"></i> Tổng cộng</span>
+        <span class="price grand-price">{{ formatPrice(order.totalAmount) }}</span>
+      </div>
+    </div>
+
+    <!-- Status History -->
+    @if (order.statusHistory.length > 0) {
+      <div class="card history-card">
+        <h3><i class="fas fa-history"></i> Lịch sử trạng thái</h3>
+        <div class="timeline">
+          @for (h of order.statusHistory; track h.createdAt; let i = $index) {
+            <div class="timeline-row" [class.first]="i === 0">
+              <div class="timeline-dot">
+                <i class="fas fa-circle-dot"></i>
+              </div>
+              <div class="timeline-content">
+                <span class="t-status">{{ h.status }}</span>
+                <span class="t-date text-muted small">{{ formatDate(h.createdAt) }}</span>
+                @if (h.note) {
+                  <span class="t-note text-muted small">{{ h.note }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  </div>
+}

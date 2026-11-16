@@ -1,0 +1,53 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý tồn kho</h1>
+    <span class="text-muted small">{{ items.length }} mặt hàng</span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="toolbar-title">Danh sách tồn kho</span>
+    </div>
+    @if (loading) {
+      <div class="loading-state">Đang tải...</div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>SKU</th>
+              <th class="td-center">Có thể bán</th>
+              <th class="td-center">Đang giữ</th>
+              <th>Nhập thêm</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of items; track item.productId) {
+              <tr>
+                <td class="td-mono">{{ item.productId }}</td>
+                <td class="td-primary">{{ item.sku }}</td>
+                <td class="td-center" style="color: var(--clr-success); font-weight: 700">
+                  {{ item.availableQty }}
+                </td>
+                <td class="td-center" style="color: var(--clr-warning)">{{ item.reservedQty }}</td>
+                <td>
+                  <div class="td-actions">
+                    <input
+                      type="number"
+                      min="1"
+                      style="width: 72px"
+                      [ngModel]="deltaMap[item.productId] ?? 0"
+                      (ngModelChange)="deltaMap[item.productId] = $event"
+                    />
+                    <button class="btn btn-sm" (click)="addStock(item.productId)">Nhập</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

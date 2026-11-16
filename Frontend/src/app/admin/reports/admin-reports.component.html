@@ -1,0 +1,74 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Báo cáo & Thống kê</h1>
+  </div>
+
+  <div class="form-card" [formGroup]="form">
+    <div class="form-title">Thông số báo cáo</div>
+    <div class="form-grid-3">
+      <div class="form-group">
+        <label>Từ ngày</label>
+        <input type="date" formControlName="from" />
+      </div>
+      <div class="form-group">
+        <label>Đến ngày</label>
+        <input type="date" formControlName="to" />
+      </div>
+      <div class="form-group">
+        <label>Định dạng</label>
+        <select formControlName="format">
+          <option value="pdf">PDF</option>
+          <option value="xlsx">Excel</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="reports-grid">
+    <div class="report-item table-card">
+      <div class="ri-header">
+        <span class="ri-icon"><i class="fas fa-chart-line"></i></span>
+        <div>
+          <div class="ri-title">Báo cáo doanh thu</div>
+          <div class="ri-desc">Tổng hợp doanh thu theo khoảng thời gian</div>
+        </div>
+      </div>
+      <button class="btn" (click)="revenue()" [disabled]="form.invalid || loading">
+        {{ loading ? 'Đang tạo...' : 'Tải xuống' }}
+      </button>
+    </div>
+
+    <div class="report-item table-card">
+      <div class="ri-header">
+        <span class="ri-icon"><i class="fas fa-trophy"></i></span>
+        <div>
+          <div class="ri-title">Top sản phẩm bán chạy</div>
+          <div class="ri-desc">
+            Top
+            <input
+              type="number"
+              formControlName="limit"
+              [formGroup]="form"
+              style="width: 52px; display: inline-block; padding: 2px 6px"
+            />
+            sản phẩm bán chạy nhất
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-outline" (click)="topProducts()" [disabled]="form.invalid || loading">
+        Tải xuống
+      </button>
+    </div>
+
+    <div class="report-item table-card">
+      <div class="ri-header">
+        <span class="ri-icon"><i class="fas fa-boxes"></i></span>
+        <div>
+          <div class="ri-title">Báo cáo tồn kho</div>
+          <div class="ri-desc">Trạng thái tồn kho hiện tại</div>
+        </div>
+      </div>
+      <button class="btn btn-outline" (click)="inventory()" [disabled]="loading">Tải xuống</button>
+    </div>
+  </div>
+</div>

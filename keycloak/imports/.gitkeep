@@ -1,0 +1,2 @@
+# Thư mục này chứa realm-export.json cho Keycloak import (tạo ở Giai đoạn 2).
+# Mount vào /opt/keycloak/data/import trong docker-compose.yml.

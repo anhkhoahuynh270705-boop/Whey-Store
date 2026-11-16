@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<title>Xác nhận đơn hàng</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; background:#111; color:#eee; margin:0; padding:0; }
+  .wrapper { max-width:620px; margin:30px auto; background:#1a1a1a; border-radius:12px; overflow:hidden; }
+  .header { background:#ff5500; padding:28px 32px; text-align:center; }
+  .header h1 { color:#fff; margin:0; font-size:22px; letter-spacing:2px; }
+  .body { padding:32px; }
+  h2 { color:#ff5500; margin-top:0; }
+  table { width:100%; border-collapse:collapse; margin:16px 0; }
+  th { background:#333; color:#ff5500; padding:10px 14px; text-align:left; }
+  td { padding:10px 14px; border-bottom:1px solid #333; color:#ddd; }
+  .total-row td { font-weight:bold; color:#ff5500; font-size:16px; }
+  .footer { background:#111; color:#666; text-align:center; padding:18px; font-size:12px; }
+  .btn { display:inline-block; background:#ff5500; color:#fff; padding:12px 28px;
+         border-radius:6px; text-decoration:none; font-weight:bold; margin-top:16px; }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <h1>💪 GYMSTORE</h1>
+    <p style="color:#ffd;margin:4px 0 0;">Xác nhận đặt hàng thành công</p>
+  </div>
+  <div class="body">
+    <h2>Xin chào, <span th:text="${fullName}">Khách hàng</span>!</h2>
+    <p>Đơn hàng <strong th:text="'#' + ${orderNumber}">GS-XXXXX</strong> của bạn đã được xác nhận.
+       Chúng tôi đang xử lý và sẽ giao hàng sớm nhất có thể.</p>
+
+    <h3 style="color:#ff5500;">Chi tiết đơn hàng</h3>
+    <table>
+      <tr><th>Sản phẩm</th><th>SL</th><th>Đơn giá</th><th>Thành tiền</th></tr>
+      <tr th:each="item : ${items}">
+        <td th:text="${item.productName}">Whey Protein</td>
+        <td th:text="${item.quantity}">1</td>
+        <td th:text="${#numbers.formatDecimal(item.unitPrice,0,'COMMA',0,'POINT') + ' ₫'}">0</td>
+        <td th:text="${#numbers.formatDecimal(item.subtotal,0,'COMMA',0,'POINT') + ' ₫'}">0</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3">Tổng cộng</td>
+        <td th:text="${#numbers.formatDecimal(totalAmount,0,'COMMA',0,'POINT') + ' ₫'}">0</td>
+      </tr>
+    </table>
+
+    <h3 style="color:#ff5500;">Địa chỉ giao hàng</h3>
+    <p th:if="${shippingAddress != null}">
+      <span th:text="${shippingAddress.fullName}"></span><br/>
+      <span th:text="${shippingAddress.phone}"></span><br/>
+      <span th:text="${shippingAddress.addressLine}"></span>,
+      <span th:text="${shippingAddress.ward}"></span>,
+      <span th:text="${shippingAddress.district}"></span>,
+      <span th:text="${shippingAddress.city}"></span>
+    </p>
+
+    <p><strong>Phương thức thanh toán:</strong> <span th:text="${paymentMethod}">COD</span></p>
+    <p><strong>Thời gian đặt:</strong> <span th:text="${#temporals.format(orderTime,'dd/MM/yyyy HH:mm')}"></span></p>
+
+    <a href="http://localhost:4200/orders" class="btn">Theo dõi đơn hàng</a>
+  </div>
+  <div class="footer">© 2026 GymStore – Website bán thực phẩm thể thao.</div>
+</div>
+</body>
+</html>

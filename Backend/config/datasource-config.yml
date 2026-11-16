@@ -1,0 +1,65 @@
+# DATASOURCE CONFIGURATION 
+
+# Product Service Database
+product-db:
+  url: jdbc:postgresql://localhost:5432/product_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+
+# Inventory Service Database
+inventory-db:
+  url: jdbc:postgresql://localhost:5432/inventory_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 30000
+
+# Order Service Database
+order-db:
+  url: jdbc:postgresql://localhost:5432/order_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 30000
+
+# Payment Service Database
+payment-db:
+  url: jdbc:postgresql://localhost:5432/payment_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 30000
+
+# Workflow Service Database
+workflow-db:
+  url: jdbc:postgresql://localhost:5432/workflow_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver
+  hikari:
+    maximum-pool-size: 10
+    minimum-idle: 5
+    connection-timeout: 30000
+
+# Keycloak Database
+keycloak-db:
+  url: jdbc:postgresql://localhost:5432/keycloak_db
+  username: postgres
+  password: Khoa123
+  driver: org.postgresql.Driver

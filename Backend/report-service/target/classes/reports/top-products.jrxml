@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TOP SẢN PHẨM BÁN CHẠY theo khoảng ngày -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="top-products" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="782" leftMargin="30" rightMargin="30"
+              topMargin="20" bottomMargin="20">
+
+  <parameter name="DATE_FROM" class="java.sql.Date"/>
+  <parameter name="DATE_TO" class="java.sql.Date"/>
+  <parameter name="TOP_LIMIT" class="java.lang.Integer"/>
+
+  <queryString>
+    <![CDATA[
+      SELECT
+        i.product_id,
+        i.product_name,
+        SUM(i.quantity) AS total_qty_sold,
+        SUM(i.subtotal)  AS total_revenue
+      FROM order_item_facts i
+      JOIN order_facts o ON o.order_id = i.order_id
+      WHERE o.status = 'COMPLETED'
+        AND DATE(o.order_date) BETWEEN $P{DATE_FROM} AND $P{DATE_TO}
+      GROUP BY i.product_id, i.product_name
+      ORDER BY total_qty_sold DESC
+      LIMIT $P{TOP_LIMIT}
+    ]]>
+  </queryString>
+
+  <field name="product_id" class="java.lang.Long"/>
+  <field name="product_name" class="java.lang.String"/>
+  <field name="total_qty_sold" class="java.lang.Long"/>
+  <field name="total_revenue" class="java.math.BigDecimal"/>
+
+  <title>
+    <band height="50">
+      <staticText><reportElement x="0" y="0" width="782" height="40"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="18" isBold="true"/></textElement>
+        <text><![CDATA[Top sản phẩm bán chạy]]></text></staticText>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="28">
+      <staticText><reportElement x="0" y="0" width="50" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[#]]></text></staticText>
+      <staticText><reportElement x="50" y="0" width="380" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Tên sản phẩm]]></text></staticText>
+      <staticText><reportElement x="430" y="0" width="176" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Số lượng bán]]></text></staticText>
+      <staticText><reportElement x="606" y="0" width="176" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Doanh thu (₫)]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="22">
+      <textField><reportElement x="0" y="0" width="50" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression></textField>
+      <textField><reportElement x="50" y="0" width="380" height="22"/>
+        <textElement textAlignment="Left"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[" " + $F{product_name}]]></textFieldExpression></textField>
+      <textField><reportElement x="430" y="0" width="176" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{total_qty_sold}]]></textFieldExpression></textField>
+      <textField pattern="#,##0"><reportElement x="606" y="0" width="176" height="22"/>
+        <textElement textAlignment="Right"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{total_revenue}]]></textFieldExpression></textField>
+    </band>
+  </detail>
+</jasperReport>

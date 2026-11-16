@@ -1,0 +1,54 @@
+<div class="staff-page">
+  <div class="page-header">
+    <h1>Kiểm tra tồn kho</h1>
+    <span class="text-muted small">
+      @if (lowStock > 0) {
+        <span class="badge badge-warning">{{ lowStock }} mặt hàng sắp hết</span>
+      }
+    </span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-toolbar">
+      <span class="toolbar-title">Danh sách tồn kho</span>
+      <div class="toolbar-filter">
+        <input type="text" placeholder="Tìm SKU..." [(ngModel)]="search" style="max-width:200px" />
+      </div>
+    </div>
+    @if (loading) {
+      <div class="loading-state">Đang tải...</div>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr>
+            <th>Product ID</th>
+            <th>SKU</th>
+            <th class="td-center">Có thể bán</th>
+            <th class="td-center">Đang giữ</th>
+            <th class="td-center">Tình trạng</th>
+          </tr></thead>
+          <tbody>
+            @for (item of filtered; track item.productId) {
+              <tr>
+                <td class="td-mono">{{ item.productId }}</td>
+                <td class="td-primary">{{ item.sku }}</td>
+                <td class="td-center" [style.color]="item.availableQty < 10 ? 'var(--clr-warning)' : 'var(--clr-success)'"
+                    style="font-weight:700">{{ item.availableQty }}</td>
+                <td class="td-center" style="color:var(--clr-warning)">{{ item.reservedQty }}</td>
+                <td class="td-center">
+                  @if (item.availableQty === 0) {
+                    <span class="badge badge-error">Hết hàng</span>
+                  } @else if (item.availableQty < 10) {
+                    <span class="badge badge-warning">Sắp hết</span>
+                  } @else {
+                    <span class="badge badge-success">Còn hàng</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

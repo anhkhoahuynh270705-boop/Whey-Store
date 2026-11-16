@@ -1,0 +1,8 @@
+router-outlet + * {
+  display: block;
+  min-height: calc(100vh - var(--navbar-h));
+  animation: pageEnter 420ms cubic-bezier(.25,.46,.45,.94) both;
+  will-change: transform, opacity;
+}
+.main-content {
+}

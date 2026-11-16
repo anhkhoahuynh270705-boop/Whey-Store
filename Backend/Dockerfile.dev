@@ -1,0 +1,33 @@
+# Development Dockerfile with hot reload support
+# Uses Spring Boot DevTools for automatic restart on file changes
+
+FROM maven:3.9-eclipse-temurin-21-alpine
+
+WORKDIR /app
+
+# Install curl for healthchecks
+RUN apk add --no-cache curl
+
+# Copy parent pom and common module
+COPY pom.xml .
+COPY gymstore-common ./gymstore-common
+
+# Pre-download dependencies for better caching
+ARG SERVICE_NAME
+COPY ${SERVICE_NAME}/pom.xml ./${SERVICE_NAME}/
+RUN mvn dependency:go-offline -pl ${SERVICE_NAME} -am || true
+
+# Copy service source (will be volume-mounted in dev)
+COPY ${SERVICE_NAME} ./${SERVICE_NAME}
+
+# Expose port and debug port
+EXPOSE 8080 5005
+
+# Spring Boot profile
+ENV SPRING_PROFILES_ACTIVE=docker
+
+# Run with hot reload using spring-boot:run
+# Debug enabled on port 5005
+WORKDIR /app/${SERVICE_NAME}
+CMD ["mvn", "spring-boot:run", \
+     "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]

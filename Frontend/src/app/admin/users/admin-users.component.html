@@ -1,0 +1,154 @@
+<div class="admin-page">
+  <div class="page-header">
+    <div class="header-left">
+      <h1><i class="fas fa-users-cog"></i> Quản lý tài khoản người dùng</h1>
+      <span class="subtext">Quản lý phân quyền và trạng thái tài khoản trên hệ thống</span>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="openCreate()">
+        <i class="fas fa-user-plus"></i> Thêm tài khoản
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input
+        type="text"
+        [(ngModel)]="search"
+        placeholder="Tìm theo username, họ tên, email..."
+        class="form-control"
+      />
+    </div>
+
+    <div class="role-filter">
+      <select [(ngModel)]="roleFilter" class="form-control">
+        <option value="">Tất cả vai trò</option>
+        <option value="ADMIN">Quản trị viên (ADMIN)</option>
+        <option value="STAFF">Nhân viên (STAFF)</option>
+        <option value="CUSTOMER">Khách hàng (CUSTOMER)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Tài khoản</th>
+            <th>Họ và tên</th>
+            <th>Email</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Ngày tạo</th>
+            <th class="text-right">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (u of filteredUsers; track u.id) {
+            <tr>
+              <td>
+                <div class="user-badge-col">
+                  <div class="avatar-circle">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div class="user-info">
+                    <span class="username">{{ u.username }}</span>
+                    <span class="user-id">{{ u.id }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <strong>{{ u.fullName }}</strong>
+              </td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span [class]="getRoleBadge(u.role)">
+                  <i
+                    class="fas"
+                    [class.fa-shield-alt]="u.role === 'ADMIN'"
+                    [class.fa-user-tie]="u.role === 'STAFF'"
+                    [class.fa-user]="u.role === 'CUSTOMER'"
+                  ></i>
+                  {{ getRoleLabel(u.role) }}
+                </span>
+              </td>
+              <td>
+                @if (u.status === 'ACTIVE') {
+                  <span class="status-pill status-active">
+                    <i class="fas fa-check-circle"></i> Đang hoạt động
+                  </span>
+                } @else {
+                  <span class="status-pill status-disabled">
+                    <i class="fas fa-ban"></i> Đã bị khóa
+                  </span>
+                }
+              </td>
+              <td class="text-muted">{{ u.createdAt }}</td>
+              <td class="text-right">
+                <button
+                  class="action-btn"
+                  [class.btn-lock]="u.status === 'ACTIVE'"
+                  [class.btn-unlock]="u.status === 'DISABLED'"
+                  (click)="toggleStatus(u)"
+                  [title]="u.status === 'ACTIVE' ? 'Khóa tài khoản' : 'Kích hoạt lại'"
+                >
+                  <i class="fas" [class.fa-lock]="u.status === 'ACTIVE'" [class.fa-unlock]="u.status === 'DISABLED'"></i>
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                Không tìm thấy tài khoản phù hợp với tìm kiếm
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Create User Modal -->
+  @if (showCreateModal) {
+    <div class="modal-backdrop" (click)="closeCreate()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3><i class="fas fa-user-plus"></i> Tạo tài khoản mới</h3>
+          <button class="btn-close" (click)="closeCreate()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Tên đăng nhập (Username) *</label>
+            <input type="text" [(ngModel)]="newUsername" class="form-control" placeholder="vd: nhanvien_kho" />
+          </div>
+          <div class="form-group">
+            <label>Họ và tên *</label>
+            <input type="text" [(ngModel)]="newFullName" class="form-control" placeholder="vd: Trần Văn B" />
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" [(ngModel)]="newEmail" class="form-control" placeholder="vd: nhanvien@gymstore.vn" />
+          </div>
+          <div class="form-group">
+            <label>Vai trò hệ thống *</label>
+            <select [(ngModel)]="newRole" class="form-control">
+              <option value="STAFF">Nhân viên bán hàng / kho (STAFF)</option>
+              <option value="ADMIN">Quản trị viên (ADMIN)</option>
+              <option value="CUSTOMER">Khách hàng (CUSTOMER)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeCreate()">Hủy</button>
+          <button class="btn btn-primary" (click)="submitCreate()">
+            <i class="fas fa-check"></i> Tạo tài khoản
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

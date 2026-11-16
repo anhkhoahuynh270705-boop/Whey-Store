@@ -1,0 +1,37 @@
+# Cart Service - Development Configuration (Redis-based, no PostgreSQL)
+spring:
+  config:
+    import:
+      - optional:file:../../config/infrastructure-config.yml
+      - optional:file:../../config/service-urls.yml
+
+  # Cart service uses Redis only, no database
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/gymstore
+
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.gymstore: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.data.redis: DEBUG

@@ -1,0 +1,114 @@
+/* =====================================================
+   ORDER LIST PAGE
+   ===================================================== */
+.order-list-page {
+  padding: var(--sp-xl) 0 var(--sp-2xl);
+}
+
+.page-header {
+  margin-bottom: var(--sp-xl);
+
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    i { color: var(--clr-primary); font-size: .85em; }
+  }
+}
+
+/* ===== EMPTY ===== */
+.empty-orders {
+  text-align: center;
+  padding: var(--sp-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-md);
+  animation: scaleIn 350ms var(--t-bounce) both;
+
+  h3 { color: var(--clr-text-soft); }
+  p  { color: var(--clr-text-muted); font-size: 14px; }
+}
+
+.empty-icon-wrap {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--clr-surface-2);
+  border: 2px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: var(--clr-border-soft);
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ===== ORDERS LIST ===== */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.order-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-md);
+  padding: var(--sp-md) var(--sp-lg);
+  flex-wrap: wrap;
+  transition: border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
+
+  &:hover {
+    border-color: rgba(255,107,26,.2);
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+  }
+}
+
+.order-icon {
+  width: 44px; height: 44px;
+  border-radius: var(--r-sm);
+  background: rgba(255, 107, 26, 0.1);
+  color: var(--clr-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+.order-meta {
+  flex: 1;
+  min-width: 160px;
+
+  .order-number {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--clr-text);
+    margin-bottom: 5px;
+    i { color: var(--clr-primary); margin-right: 4px; font-size: 12px; }
+  }
+
+  .order-sub {
+    font-size: 12.5px;
+    color: var(--clr-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    i { font-size: 11px; }
+  }
+}
+
+.order-amount {
+  font-size: 1.05rem;
+  font-weight: 800;
+  min-width: 110px;
+  text-align: right;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 600px) {
+  .order-row { gap: var(--sp-sm); }
+  .order-amount { text-align: left; }
+}

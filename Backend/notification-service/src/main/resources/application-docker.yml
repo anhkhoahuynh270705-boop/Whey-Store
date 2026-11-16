@@ -1,0 +1,42 @@
+# Notification Service - Docker Configuration
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/notification_db
+    username: postgres
+    password: Khoa123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: kafka:19092
+
+  mail:
+    host: mailhog
+    port: 1025
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak:8080/realms/gymstore/protocol/openid-connect/certs
+
+server:
+  port: 8087
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.gymstore: DEBUG
+    org.springframework.kafka: INFO

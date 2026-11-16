@@ -1,0 +1,15 @@
+com\gymstore\notification\enums\EmailStatus.class
+com\gymstore\notification\mapper\EmailMapperImpl.class
+com\gymstore\notification\exception\code\NotificationErrorCode.class
+com\gymstore\notification\exception\BusinessException.class
+com\gymstore\notification\exception\GlobalExceptionHandler.class
+com\gymstore\notification\mapper\EmailMapper.class
+com\gymstore\notification\service\IEmailService.class
+com\gymstore\notification\repository\EmailLogRepository.class
+com\gymstore\notification\consumer\OrderEventConsumer.class
+com\gymstore\notification\service\impl\EmailServiceImpl.class
+com\gymstore\notification\config\SecurityConfig.class
+com\gymstore\notification\config\KafkaConsumerConfig.class
+com\gymstore\notification\NotificationServiceApplication.class
+com\gymstore\notification\entity\EmailLog.class
+com\gymstore\notification\exception\IErrorCode.class

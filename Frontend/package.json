@@ -1,0 +1,52 @@
+{
+  "name": "whey-store",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "config:env": "node scripts/set-env.js",
+    "prestart": "node scripts/set-env.js",
+    "prestart:admin": "node scripts/set-env.js",
+    "prestart:staff": "node scripts/set-env.js",
+    "prestart:all": "node scripts/set-env.js",
+    "prebuild": "node scripts/set-env.js",
+    "prebuild:admin": "node scripts/set-env.js",
+    "prebuild:staff": "node scripts/set-env.js",
+    "prebuild:all": "node scripts/set-env.js",
+    "start": "ng serve whey-store",
+    "start:admin": "ng serve admin",
+    "start:staff": "ng serve staff",
+    "start:all": "concurrently --names \"STORE,ADMIN,STAFF\" --prefix-colors \"#ff5500,#6366f1,#0d9488\" \"ng serve whey-store\" \"ng serve admin\" \"ng serve staff\"",
+    "build": "ng build whey-store",
+    "build:admin": "ng build admin",
+    "build:staff": "ng build staff",
+    "build:all": "ng build whey-store && ng build admin && ng build staff",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "packageManager": "npm@11.19.0",
+  "dependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "@types/three": "^0.187.0",
+    "keycloak-js": "26.0.0",
+    "rxjs": "~7.8.0",
+    "three": "^0.187.0",
+    "tslib": "^2.3.0",
+    "zone.js": "^0.16.3"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.7",
+    "@angular/cli": "^22.1.7",
+    "@angular/compiler-cli": "^22.1.0",
+    "concurrently": "^10.0.7",
+    "jsdom": "^28.0.0",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.8"
+  }
+}

@@ -1,0 +1,26 @@
+# Base configuration - Workflow service with Camunda
+# Profile-specific config (dev, docker, prod) in application-{profile}.yml
+
+spring:
+  application:
+    name: workflow-service
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+server:
+  port: 8086
+
+# Camunda BPM Engine Configuration
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: admin
+      first-name: Admin
+    history-level: audit
+    auto-deployment-enabled: true
+    webapp:
+      application-path: /camunda
+    generic-properties:
+      properties:
+        enable-script-compilation: false

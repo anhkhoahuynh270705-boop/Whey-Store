@@ -1,0 +1,203 @@
+/* =====================================================
+   CHECKOUT PAGE
+   ===================================================== */
+.checkout-page {
+  padding: var(--sp-xl) 0 var(--sp-2xl);
+}
+
+.page-header {
+  margin-bottom: var(--sp-xl);
+
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    i { color: var(--clr-primary); font-size: .85em; }
+  }
+}
+
+/* ===== LAYOUT ===== */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--sp-xl);
+  align-items: start;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== SHIPPING FORM ===== */
+.shipping-form {
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: var(--sp-lg);
+    padding-bottom: var(--sp-sm);
+    border-bottom: 1px solid var(--clr-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--clr-text-soft);
+    i { color: var(--clr-primary); }
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-md);
+  margin-bottom: var(--sp-md);
+
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.form-row-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+  @media (max-width: 700px) { grid-template-columns: 1fr; }
+}
+
+.form-group {
+  margin-bottom: var(--sp-md);
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    i { color: var(--clr-text-muted); font-size: 11px; }
+  }
+}
+
+/* ===== PAYMENT OPTIONS ===== */
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: var(--sp-lg);
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px var(--sp-md);
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--clr-text-soft);
+  transition: border-color var(--t-fast), background var(--t-fast), color var(--t-fast);
+
+  input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--clr-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  &:has(input:checked) {
+    border-color: var(--clr-primary);
+    background: rgba(255, 107, 26, 0.06);
+    color: var(--clr-text);
+
+    .payment-check { opacity: 1; color: var(--clr-primary); }
+    .payment-icon { color: var(--clr-primary); }
+  }
+
+  &:hover { border-color: var(--clr-primary-lt); }
+}
+
+.payment-icon {
+  font-size: 18px;
+  color: var(--clr-text-muted);
+  width: 24px;
+  text-align: center;
+  transition: color var(--t-fast);
+}
+
+.payment-label {
+  flex: 1;
+  font-weight: 500;
+}
+
+.payment-check {
+  opacity: 0;
+  font-size: 16px;
+  transition: opacity var(--t-fast);
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  justify-content: center;
+  border-radius: var(--r-md);
+}
+
+/* ===== ORDER SUMMARY ===== */
+.order-summary {
+  position: sticky;
+  top: calc(var(--navbar-h) + 24px);
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: var(--sp-md);
+    padding-bottom: var(--sp-md);
+    border-bottom: 1px solid var(--clr-border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    i { color: var(--clr-primary); }
+  }
+}
+
+.summary-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: var(--sp-md);
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--sp-md);
+  padding: 9px 0;
+  font-size: 13px;
+  color: var(--clr-text-soft);
+  border-bottom: 1px solid var(--clr-border);
+
+  .item-name { flex: 1; line-height: 1.4; }
+  .item-amt  { white-space: nowrap; font-weight: 600; color: var(--clr-text); }
+}
+
+.summary-row-s {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 13.5px;
+  color: var(--clr-text-soft);
+  border-bottom: 1px solid var(--clr-border);
+  margin-bottom: var(--sp-sm);
+
+  i { margin-right: 6px; color: var(--clr-text-muted); }
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-sm) 0 var(--sp-md);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.grand {
+  font-size: 1.4rem !important;
+  font-family: 'Barlow', sans-serif !important;
+}

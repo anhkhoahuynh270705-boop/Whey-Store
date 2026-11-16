@@ -1,0 +1,58 @@
+<div class="staff-shell" [class.sidebar-collapsed]="!sidebarOpen()">
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <span class="logo-icon"><i class="fas fa-shield-alt"></i></span>
+      <span class="logo-text">STAFF</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of nav; track item.path) {
+        <a
+          class="nav-item"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.path === '/dashboard' }"
+        >
+          <i [class]="item.icon + ' nav-icon'"></i>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <span class="user-avatar">{{
+          (auth.fullName ?? auth.username ?? 'S')[0].toUpperCase()
+        }}</span>
+        <div class="user-meta">
+          <span class="user-name">{{ auth.fullName ?? auth.username }}</span>
+          <span class="user-role">Staff</span>
+        </div>
+      </div>
+      <button class="btn-logout" (click)="auth.logout()" title="Đăng xuất"><i class="fas fa-power-off"></i></button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="staff-main">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="toggle-btn" (click)="sidebarOpen.set(!sidebarOpen())" title="Toggle sidebar">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="topbar-title">
+        <span>GymStore</span>
+        <span class="topbar-sep">/</span>
+        <span class="topbar-sub">Nhân viên bán hàng</span>
+      </div>
+      <div class="topbar-badge">STAFF PORTAL</div>
+    </header>
+
+    <!-- Content -->
+    <main class="staff-content">
+      <router-outlet />
+    </main>
+  </div>
+  <app-toast />
+</div>

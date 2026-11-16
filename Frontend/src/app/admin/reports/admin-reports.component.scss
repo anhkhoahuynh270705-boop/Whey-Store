@@ -1,0 +1,24 @@
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.report-item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+
+  .ri-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    .ri-icon { font-size: 2rem; flex-shrink: 0; }
+    .ri-title { font-weight: 600; font-size: 15px; color: var(--clr-text); margin-bottom: 4px; }
+    .ri-desc  { font-size: 13px; color: var(--clr-text-muted); line-height: 1.5; }
+  }
+
+  .btn { align-self: flex-start; }
+}

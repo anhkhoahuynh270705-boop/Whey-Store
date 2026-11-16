@@ -1,0 +1,123 @@
+<div class="container page-products">
+  <div class="page-header">
+    <h1><i class="fas fa-box-open"></i> Tất cả sản phẩm</h1>
+    @if (products) {
+      <div class="result-info text-muted">
+        Tìm thấy <strong class="text-primary">{{ products.totalElements }}</strong> sản phẩm
+      </div>
+    }
+  </div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar card" [formGroup]="filterForm">
+    <div class="filter-search">
+      <i class="fas fa-search search-icon"></i>
+      <input type="text" placeholder="Tìm kiếm sản phẩm..." formControlName="search" class="search-input" />
+    </div>
+
+    <div class="filter-controls">
+      <div class="select-wrap">
+        <i class="fas fa-th-list select-icon"></i>
+        <select formControlName="categoryId">
+          <option [ngValue]="undefined">Tất cả danh mục</option>
+          @for (cat of categories; track cat.id) {
+            <option [value]="cat.id">{{ cat.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="select-wrap">
+        <i class="fas fa-trademark select-icon"></i>
+        <select formControlName="brandId">
+          <option [ngValue]="undefined">Tất cả thương hiệu</option>
+          @for (b of brands; track b.id) {
+            <option [value]="b.id">{{ b.name }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="price-range">
+        <i class="fas fa-tag price-icon"></i>
+        <input type="number" placeholder="Giá từ" formControlName="minPrice" />
+        <span class="price-dash">—</span>
+        <input type="number" placeholder="Đến" formControlName="maxPrice" />
+      </div>
+
+      <div class="select-wrap">
+        <i class="fas fa-sort select-icon"></i>
+        <select formControlName="sort">
+          @for (opt of sortOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  @if (loading) {
+    <div class="loading-row">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...
+    </div>
+  }
+
+  <!-- PRODUCTS GRID -->
+  @if (products) {
+    <div class="grid-products">
+      @for (p of products.content; track p.id) {
+        <div class="card product-card">
+          <a [routerLink]="['/products', p.slug]" class="img-wrap">
+            <img [src]="p.primaryImage || 'https://placehold.co/300x300/111820/ff6b1a?text=GymStore'"
+                 [alt]="p.name" loading="lazy" />
+            @if (p.salePrice) {
+              <div class="product-badges">
+                <span class="badge badge-primary"><i class="fas fa-tag"></i> Sale</span>
+              </div>
+            }
+          </a>
+          <div class="product-info">
+            <div class="product-brand">
+              <i class="fas fa-shield-alt"></i> {{ p.brandName }}
+            </div>
+            <a class="product-name" [routerLink]="['/products', p.slug]">{{ p.name }}</a>
+            <div class="product-price">
+              @if (p.salePrice) {
+                <span class="price">{{ formatPrice(p.salePrice) }}</span>
+                <span class="price-old">{{ formatPrice(p.price) }}</span>
+              } @else {
+                <span class="price">{{ formatPrice(p.price) }}</span>
+              }
+            </div>
+            <button class="btn btn-sm" (click)="addToCart(p)">
+              <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- EMPTY STATE -->
+    @if (products.content.length === 0 && !loading) {
+      <div class="empty-state card">
+        <i class="fas fa-search empty-icon"></i>
+        <h3>Không tìm thấy sản phẩm</h3>
+        <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>
+      </div>
+    }
+
+    <!-- PAGINATION -->
+    @if (products.totalPages > 1) {
+      <div class="pagination">
+        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        @for (p of pages; track p) {
+          <button [class.active]="p === currentPage" (click)="goToPage(p)">{{ p + 1 }}</button>
+        }
+        <button (click)="goToPage(currentPage + 1)" [disabled]="products.last">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    }
+  }
+</div>

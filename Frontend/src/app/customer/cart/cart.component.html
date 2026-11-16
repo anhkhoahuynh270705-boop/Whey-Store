@@ -1,0 +1,88 @@
+<div class="container page-cart">
+  <div class="page-header">
+    <h1><i class="fas fa-shopping-cart"></i> Giỏ hàng</h1>
+  </div>
+
+  @if (cart$ | async; as cart) {
+    @if (cart.items.length === 0) {
+      <div class="empty-cart card">
+        <div class="empty-icon-wrap">
+          <i class="fas fa-cart-plus"></i>
+        </div>
+        <h3>Giỏ hàng của bạn đang trống</h3>
+        <p>Hãy khám phá các sản phẩm chất lượng và thêm vào giỏ hàng!</p>
+        <a routerLink="/products" class="btn btn-lg">
+          <i class="fas fa-shopping-bag"></i> Tiếp tục mua sắm
+        </a>
+      </div>
+    } @else {
+      <div class="cart-layout">
+        <div class="cart-items">
+          @for (item of cart.items; track item.productId) {
+            <div class="cart-item card">
+              <a class="item-img-wrap">
+                <img
+                  [src]="item.imageUrl || 'https://placehold.co/80x80/111820/ff6b1a?text=GS'"
+                  [alt]="item.name"
+                />
+              </a>
+              <div class="item-info">
+                <div class="item-name">{{ item.name }}</div>
+                <div class="item-price text-muted small">
+                  <i class="fas fa-tag"></i>
+                  {{ formatPrice(effectivePrice(item)) }} / sản phẩm
+                </div>
+              </div>
+              <div class="qty-ctrl">
+                <button
+                  class="qty-btn"
+                  (click)="update(item.productId, item.quantity - 1)"
+                  [disabled]="item.quantity <= 1"
+                >
+                  <i class="fas fa-minus"></i>
+                </button>
+                <span class="qty-num">{{ item.quantity }}</span>
+                <button class="qty-btn" (click)="update(item.productId, item.quantity + 1)">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+              <div class="item-subtotal">
+                <span class="price">{{ formatPrice(effectivePrice(item) * item.quantity) }}</span>
+              </div>
+              <button class="btn-remove" (click)="remove(item.productId)" title="Xóa">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="cart-summary card">
+          <h3><i class="fas fa-receipt"></i> Tổng đơn hàng</h3>
+
+          <div class="summary-row">
+            <span><i class="fas fa-box"></i> {{ cart.totalQuantity }} sản phẩm</span>
+            <span class="price">{{ formatPrice(cart.totalAmount) }}</span>
+          </div>
+          <div class="summary-row muted-row">
+            <span><i class="fas fa-shipping-fast"></i> Phí vận chuyển</span>
+            <span class="text-success">Miễn phí</span>
+          </div>
+          <div class="summary-total">
+            <span>Tổng cộng</span>
+            <span class="price grand-total">{{ formatPrice(cart.totalAmount) }}</span>
+          </div>
+
+          <a routerLink="/checkout" class="btn btn-block">
+            <i class="fas fa-lock"></i> Thanh toán ngay
+          </a>
+          <a routerLink="/products" class="btn btn-block btn-ghost" style="margin-top: 10px">
+            <i class="fas fa-arrow-left"></i> Tiếp tục mua sắm
+          </a>
+        </div>
+      </div>
+    }
+  } @else {
+    <div class="loading-row"><i class="fas fa-spinner fa-spin"></i> Đang tải giỏ hàng...</div>
+  }
+</div>

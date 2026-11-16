@@ -1,0 +1,54 @@
+<div class="container order-list-page">
+  <div class="page-header">
+    <h1><i class="fas fa-receipt"></i> Lịch sử đơn hàng</h1>
+  </div>
+
+  @if (loading) {
+    <div class="loading-row">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải đơn hàng...
+    </div>
+  }
+
+  @if (data && data.content.length === 0) {
+    <div class="card empty-orders">
+      <div class="empty-icon-wrap">
+        <i class="fas fa-box-open"></i>
+      </div>
+      <h3>Bạn chưa có đơn hàng nào</h3>
+      <p>Hãy khám phá sản phẩm và đặt hàng ngay!</p>
+      <a routerLink="/products" class="btn btn-lg">
+        <i class="fas fa-shopping-bag"></i> Mua ngay
+      </a>
+    </div>
+  }
+
+  @if (data && data.content.length > 0) {
+    <div class="orders-list">
+      @for (order of data.content; track order.id) {
+        <div class="card order-row">
+          <div class="order-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="order-meta">
+            <div class="order-number">
+              <i class="fas fa-hashtag"></i> {{ order.orderNumber }}
+            </div>
+            <div class="order-sub">
+              <i class="fas fa-calendar-alt"></i> {{ formatDate(order.createdAt) }}
+              &nbsp;·&nbsp;
+              <i class="fas fa-cubes"></i> {{ order.items.length }} sản phẩm
+            </div>
+          </div>
+          <div class="price order-amount">{{ formatPrice(order.totalAmount) }}</div>
+          <span [class]="statusBadge(order.status)">
+            <i [class]="statusIcon(order.status)"></i>
+            {{ order.status }}
+          </span>
+          <a [routerLink]="['/orders', order.id]" class="btn btn-sm btn-outline">
+            <i class="fas fa-eye"></i> Chi tiết
+          </a>
+        </div>
+      }
+    </div>
+  }
+</div>

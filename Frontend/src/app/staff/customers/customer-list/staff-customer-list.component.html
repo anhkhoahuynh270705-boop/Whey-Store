@@ -1,0 +1,63 @@
+<div class="staff-page">
+  <div class="page-header">
+    <div class="header-left">
+      <h1><i class="fas fa-users"></i> Khách hàng mua sắm</h1>
+      <span class="subtext">Danh sách khách hàng phát sinh từ đơn hàng thực tế trong cơ sở dữ liệu</span>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="page-loading">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải thông tin khách hàng...
+    </div>
+  } @else if (customers.length === 0) {
+    <div class="table-card">
+      <div class="empty-state">
+        <span class="empty-icon"><i class="fas fa-users-slash"></i></span>
+        <span class="empty-title">Chưa có khách hàng</span>
+        <p>Hệ thống chưa ghi nhận khách hàng có đơn hàng nào.</p>
+      </div>
+    </div>
+  } @else {
+    <div class="table-card">
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Họ và tên</th>
+              <th>Số điện thoại</th>
+              <th>Địa chỉ nhận hàng</th>
+              <th>Số đơn</th>
+              <th>Tổng chi tiêu</th>
+              <th>Lần đặt gần nhất</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of customers; track c.phone) {
+              <tr>
+                <td>
+                  <div class="customer-col">
+                    <div class="avatar-circle"><i class="fas fa-user"></i></div>
+                    <div class="customer-info">
+                      <span class="name">{{ c.fullName }}</span>
+                      <span class="account">TK: {{ c.userId }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="phone-tag"><i class="fas fa-phone-alt"></i> {{ c.phone }}</span>
+                </td>
+                <td>{{ c.address }}</td>
+                <td>
+                  <span class="badge badge-primary">{{ c.orderCount }} đơn</span>
+                </td>
+                <td class="price-col">{{ formatPrice(c.totalSpent) }}</td>
+                <td class="text-muted">{{ formatDate(c.lastOrderAt) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

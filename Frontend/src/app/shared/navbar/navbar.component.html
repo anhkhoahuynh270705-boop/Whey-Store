@@ -1,0 +1,77 @@
+<nav class="navbar" [class.scrolled]="scrolled">
+  <div class="nav-container">
+    <a class="nav-logo" routerLink="/home">
+      <span class="logo-icon"><i class="fas fa-dumbbell"></i></span>
+      <span class="logo-text">GYM<span class="logo-accent">STORE</span></span>
+    </a>
+
+    <ul class="nav-links" [class.open]="mobileOpen">
+      <li>
+        <a routerLink="/products" routerLinkActive="active" (click)="mobileOpen = false">
+          <i class="fas fa-box-open"></i>
+          <span>Sản phẩm</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/cart" routerLinkActive="active" (click)="mobileOpen = false">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Giỏ hàng</span>
+          @if (cartCount > 0) {
+            <span class="cart-badge">{{ cartCount }}</span>
+          }
+        </a>
+      </li>
+      @if (auth.isLoggedIn) {
+        <li>
+          <a routerLink="/orders" routerLinkActive="active" (click)="mobileOpen = false">
+            <i class="fas fa-receipt"></i>
+            <span>Đơn hàng</span>
+          </a>
+        </li>
+        @if (auth.hasRole('ADMIN') || auth.hasRole('STAFF')) {
+          <li>
+            <a routerLink="/admin" routerLinkActive="active" (click)="mobileOpen = false">
+              <i class="fas fa-cog"></i>
+              <span>Quản trị</span>
+            </a>
+          </li>
+        }
+        <li class="nav-user">
+          <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <span class="username">{{ auth.fullName ?? auth.username }}</span>
+          <button class="btn btn-sm btn-outline" (click)="auth.logout()">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Đăng xuất</span>
+          </button>
+        </li>
+      } @else {
+        <li>
+          <button class="btn btn-sm" (click)="auth.login()">
+            <i class="fas fa-sign-in-alt"></i>
+            Đăng nhập
+          </button>
+        </li>
+        <li>
+          <button class="btn btn-sm btn-outline" (click)="auth.register()">
+            <i class="fas fa-user-plus"></i>
+            Đăng ký
+          </button>
+        </li>
+      }
+    </ul>
+
+    <!-- Hamburger -->
+    <button
+      class="hamburger"
+      (click)="toggleMobile()"
+      [class.active]="mobileOpen"
+      aria-label="Menu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+</nav>

@@ -1,0 +1,164 @@
+<section class="hero">
+  <!-- Three.js animated background -->
+  <app-three-bg></app-three-bg>
+
+  <div class="hero-content container">
+    <div class="hero-badge">
+      <i class="fas fa-fire"></i>
+      <span>Thực phẩm bổ sung cao cấp</span>
+    </div>
+    <h1 class="hero-title">
+      NÂNG CẤP <span class="text-primary">HIỆU SUẤT</span><br>
+      TẬP LUYỆN
+    </h1>
+    <p class="hero-desc">
+      Protein, BCAA, Pre-workout và hơn 500+ sản phẩm chất lượng<br>
+      dành cho người tập gym chuyên nghiệp
+    </p>
+    <div class="hero-cta">
+      <a routerLink="/products" class="btn btn-xl">
+        <i class="fas fa-shopping-bag"></i>
+        Mua ngay
+      </a>
+      <a routerLink="/products" class="btn btn-xl btn-outline">
+        <i class="fas fa-th-large"></i>
+        Khám phá
+      </a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">500+</span>
+        <span class="stat-label">Sản phẩm</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">50+</span>
+        <span class="stat-label">Thương hiệu</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat">
+        <span class="stat-num">10K+</span>
+        <span class="stat-label">Khách hàng</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint">
+    <i class="fas fa-chevron-down"></i>
+  </div>
+</section>
+
+<!-- ===== WHY US ===== -->
+<section class="why-us container">
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon"><i class="fas fa-certificate"></i></div>
+      <h4>Chính hãng 100%</h4>
+      <p>Nhập khẩu trực tiếp, có kiểm định chất lượng</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="fas fa-shipping-fast"></i></div>
+      <h4>Giao hàng nhanh</h4>
+      <p>Shipper tận nơi trong 2–4 giờ nội thành</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="fas fa-headset"></i></div>
+      <h4>Tư vấn 24/7</h4>
+      <p>Chuyên gia dinh dưỡng hỗ trợ miễn phí</p>
+    </div>
+    <div class="why-card">
+      <div class="why-icon"><i class="fas fa-undo"></i></div>
+      <h4>Đổi trả dễ dàng</h4>
+      <p>30 ngày đổi trả, không cần lý do</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CATEGORIES ===== -->
+<section class="categories container">
+  <div class="section-title">
+    <i class="fas fa-th-large title-icon"></i>
+    Danh mục nổi bật
+  </div>
+  <div class="cat-grid">
+    @for (cat of categories; track cat.slug) {
+      <a class="cat-card" [routerLink]="['/products']" [queryParams]="{category: cat.slug}">
+        <div class="cat-icon-wrap">
+          <i [class]="cat.icon"></i>
+        </div>
+        <span class="cat-name">{{ cat.name }}</span>
+        <span class="cat-arrow"><i class="fas fa-arrow-right"></i></span>
+      </a>
+    }
+  </div>
+</section>
+
+<!-- ===== FEATURED PRODUCTS ===== -->
+<section class="featured container">
+  <div class="section-header">
+    <div class="section-title">
+      <i class="fas fa-star title-icon"></i>
+      Sản phẩm mới nhất
+    </div>
+    <a routerLink="/products" class="btn btn-sm btn-ghost">
+      Xem tất cả <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+
+  <div class="grid-products">
+    @for (p of featured; track p.id) {
+      <div class="card product-card">
+        <a [routerLink]="['/products', p.slug]" class="img-wrap">
+          <img [src]="p.primaryImage || 'https://placehold.co/300x300/111820/ff6b1a?text=GymStore'"
+               [alt]="p.name" loading="lazy" />
+          @if (p.salePrice) {
+            <div class="product-badges">
+              <span class="badge badge-primary"><i class="fas fa-tag"></i> Sale</span>
+            </div>
+          }
+        </a>
+        <div class="product-info">
+          <div class="product-brand">
+            <i class="fas fa-shield-alt"></i> {{ p.brandName }}
+          </div>
+          <a class="product-name" [routerLink]="['/products', p.slug]">{{ p.name }}</a>
+          <div class="product-price">
+            @if (p.salePrice) {
+              <span class="price">{{ formatPrice(p.salePrice) }}</span>
+              <span class="price-old">{{ formatPrice(p.price) }}</span>
+            } @else {
+              <span class="price">{{ formatPrice(p.price) }}</span>
+            }
+          </div>
+          <button class="btn btn-sm" (click)="addToCart(p)">
+            <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="view-all">
+    <a routerLink="/products" class="btn btn-lg btn-outline">
+      <i class="fas fa-th-large"></i>
+      Xem tất cả sản phẩm
+      <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+</section>
+
+<!-- ===== BANNER CTA ===== -->
+<section class="cta-banner">
+  <div class="container cta-content">
+    <div class="cta-text">
+      <h2><i class="fas fa-bolt"></i> Bắt đầu hành trình của bạn hôm nay</h2>
+      <p>Đăng ký thành viên để nhận ưu đãi độc quyền và tư vấn dinh dưỡng miễn phí</p>
+    </div>
+    <div class="cta-actions">
+      <a routerLink="/products" class="btn btn-lg">
+        <i class="fas fa-dumbbell"></i> Khám phá ngay
+      </a>
+    </div>
+  </div>
+</section>

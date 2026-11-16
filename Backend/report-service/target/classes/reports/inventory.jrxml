@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- BÁO CÁO TỒN KHO – gọi REST inventory-service, map sang datasource bean -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports
+                http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="inventory" pageWidth="842" pageHeight="595" orientation="Landscape"
+              columnWidth="782" leftMargin="30" rightMargin="30"
+              topMargin="20" bottomMargin="20">
+
+  <!-- Truy vấn tồn kho từ report_db (đồng bộ từ inventory-service qua REST) -->
+  <queryString>
+    <![CDATA[
+      SELECT
+        ii.product_id,
+        ii.sku,
+        ii.available_qty,
+        ii.reserved_qty,
+        (ii.available_qty + ii.reserved_qty) AS total_qty
+      FROM inventory_snapshot ii
+      ORDER BY ii.product_id
+    ]]>
+  </queryString>
+
+  <field name="product_id" class="java.lang.Long"/>
+  <field name="sku" class="java.lang.String"/>
+  <field name="available_qty" class="java.lang.Integer"/>
+  <field name="reserved_qty" class="java.lang.Integer"/>
+  <field name="total_qty" class="java.lang.Integer"/>
+
+  <title>
+    <band height="50">
+      <staticText><reportElement x="0" y="0" width="782" height="40"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="18" isBold="true"/></textElement>
+        <text><![CDATA[Báo cáo tồn kho hiện tại]]></text></staticText>
+    </band>
+  </title>
+
+  <columnHeader>
+    <band height="28">
+      <staticText><reportElement x="0" y="0" width="120" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Product ID]]></text></staticText>
+      <staticText><reportElement x="120" y="0" width="250" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[SKU]]></text></staticText>
+      <staticText><reportElement x="370" y="0" width="137" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Có thể bán]]></text></staticText>
+      <staticText><reportElement x="507" y="0" width="137" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Đang giữ]]></text></staticText>
+      <staticText><reportElement x="644" y="0" width="138" height="28" backcolor="#333333" mode="Opaque"/>
+        <textElement textAlignment="Center" verticalAlignment="Middle"><font fontName="DejaVu Sans" size="11" isBold="true" forecolor="#FF5500"/></textElement>
+        <text><![CDATA[Tổng]]></text></staticText>
+    </band>
+  </columnHeader>
+
+  <detail>
+    <band height="22">
+      <textField><reportElement x="0" y="0" width="120" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{product_id}]]></textFieldExpression></textField>
+      <textField><reportElement x="120" y="0" width="250" height="22"/>
+        <textElement textAlignment="Left"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[" " + $F{sku}]]></textFieldExpression></textField>
+      <textField><reportElement x="370" y="0" width="137" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{available_qty}]]></textFieldExpression></textField>
+      <textField><reportElement x="507" y="0" width="137" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{reserved_qty}]]></textFieldExpression></textField>
+      <textField><reportElement x="644" y="0" width="138" height="22"/>
+        <textElement textAlignment="Center"><font fontName="DejaVu Sans" size="10"/></textElement>
+        <textFieldExpression><![CDATA[$F{total_qty}]]></textFieldExpression></textField>
+    </band>
+  </detail>
+</jasperReport>

@@ -1,0 +1,364 @@
+$sidebar-w: 240px;
+$sidebar-collapsed: 64px;
+$topbar-h: 56px;
+$sidebar-bg: #111318;
+$sidebar-border: #1f2128;
+$topbar-bg: #13151a;
+$accent: #6366f1;
+$accent-dk: #4f52c9;
+$accent-lt: #818cf8;
+$surface: #1a1c23;
+$border: #252830;
+$text: #e8eaf0;
+$text-muted: #7a7f94;
+$text-soft: #b0b4c8;
+$success: #22c55e;
+$warning: #f59e0b;
+$danger: #ef4444;
+$transition: 200ms ease;
+
+/* ===== SHELL GRID ===== */
+.admin-shell {
+  display: grid;
+  grid-template-columns: $sidebar-w 1fr;
+  min-height: 100vh;
+  background: #0d0f14;
+  transition: grid-template-columns $transition;
+
+  &.sidebar-collapsed {
+    grid-template-columns: $sidebar-collapsed 1fr;
+
+    .sidebar-header {
+      .logo-text {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+      }
+    }
+    .nav-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+    .user-meta {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+    }
+  }
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $sidebar-bg;
+  border-right: 1px solid $sidebar-border;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  height: $topbar-h;
+  border-bottom: 1px solid $sidebar-border;
+  flex-shrink: 0;
+
+  .logo-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    color: $accent-lt;
+  }
+  .logo-text {
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: $text;
+    white-space: nowrap;
+    transition:
+      opacity $transition,
+      width $transition;
+  }
+}
+
+/* ===== NAV ===== */
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: $text-muted;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background $transition,
+    color $transition;
+
+  .nav-icon {
+    font-size: 1.1rem;
+    flex-shrink: 0;
+    width: 22px;
+    text-align: center;
+  }
+  .nav-label {
+    white-space: nowrap;
+    transition:
+      opacity $transition,
+      width $transition;
+    overflow: hidden;
+  }
+
+  &:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: $text;
+  }
+  &.active {
+    background: rgba(99, 102, 241, 0.18);
+    color: $accent-lt;
+    font-weight: 600;
+
+    .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.6));
+    }
+  }
+}
+
+/* ===== SIDEBAR FOOTER ===== */
+.sidebar-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border-top: 1px solid $sidebar-border;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: $accent;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  transition:
+    opacity $transition,
+    width $transition;
+
+  .user-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-role {
+    font-size: 11px;
+    color: $accent-lt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+.btn-logout {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  border: 1px solid $border;
+  background: transparent;
+  color: $text-muted;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background $transition,
+    color $transition,
+    border-color $transition;
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: $danger;
+    color: $danger;
+  }
+}
+
+/* ===== MAIN AREA ===== */
+.admin-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 0;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: $topbar-h;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  background: $topbar-bg;
+  border-bottom: 1px solid $border;
+  flex-shrink: 0;
+}
+
+.toggle-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: background $transition;
+  flex-shrink: 0;
+
+  span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: $text-muted;
+    border-radius: 2px;
+    transition: background $transition;
+  }
+  &:hover {
+    background: $surface;
+    span {
+      background: $text;
+    }
+  }
+}
+
+.topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: $text-muted;
+  flex: 1;
+
+  span:first-child {
+    color: $text;
+    font-weight: 600;
+  }
+  .topbar-sep {
+    color: $border;
+  }
+  .topbar-sub {
+    color: $text-muted;
+  }
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-link {
+  font-size: 13px;
+  color: $text-muted;
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid $border;
+  border-radius: 6px;
+  transition:
+    color $transition,
+    border-color $transition,
+    background $transition;
+
+  &:hover {
+    color: $text;
+    border-color: $accent;
+    background: rgba(99, 102, 241, 0.08);
+  }
+}
+
+/* ===== CONTENT ===== */
+.admin-content {
+  flex: 1;
+  padding: 28px;
+  overflow-x: hidden;
+}
+
+/* ===== SHARED ADMIN TOKENS (cascade vào pages) ===== */
+:host {
+  --admin-accent: #{$accent};
+  --admin-accent-dk: #{$accent-dk};
+  --admin-accent-lt: #{$accent-lt};
+  --admin-surface: #{$surface};
+  --admin-border: #{$border};
+  --admin-text: #{$text};
+  --admin-text-muted: #{$text-muted};
+  --admin-text-soft: #{$text-soft};
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .admin-shell {
+    grid-template-columns: 0 1fr;
+  }
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform $transition;
+  }
+  .admin-shell:not(.sidebar-collapsed) .sidebar {
+    transform: translateX(0);
+    width: $sidebar-w;
+  }
+}

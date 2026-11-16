@@ -1,0 +1,45 @@
+package com.gymstore.cart.security;
+
+import com.gymstore.common.security.KeycloakRealmRolesConverter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.SecurityFilterChain;
+
+/**
+ * cart-service:
+ * - /api/cart/** permitAll (khách vãng lai dùng giỏ guest theo header X-Cart-Id).
+ *   Nếu có JWT hợp lệ → tự động dùng giỏ của user.
+ * - /api/cart/merge yêu cầu đã đăng nhập (CUSTOMER).
+ */
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+public class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(c -> c.disable())
+            .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.POST, "/api/cart/merge").authenticated()
+                .requestMatchers("/api/cart/**").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(o -> o.jwt(jwt -> jwt.jwtAuthenticationConverter(keycloakConverter())));
+        return http.build();
+    }
+
+    @Bean
+    Converter<Jwt, AbstractAuthenticationToken> keycloakConverter() {
+        return KeycloakRealmRolesConverter.forServlet();
+    }
+}

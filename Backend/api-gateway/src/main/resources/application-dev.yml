@@ -1,0 +1,43 @@
+# API Gateway - Development Configuration
+spring:
+  config:
+    import:
+      - optional:file:../../config/service-urls.yml
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8090/realms/gymstore
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+
+# Service URLs for routing
+services:
+  product: http://localhost:8081
+  inventory: http://localhost:8082
+  cart: http://localhost:8083
+  order: http://localhost:8084
+  payment: http://localhost:8085
+  workflow: http://localhost:8086
+  report: http://localhost:8088
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.gymstore.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.security: DEBUG

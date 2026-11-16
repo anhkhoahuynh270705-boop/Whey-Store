@@ -1,0 +1,79 @@
+<div class="staff-page">
+  <div class="page-header">
+    <div class="header-left">
+      <button class="back-btn" (click)="goBack()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div>
+        <h1><i class="fas fa-clipboard-check"></i> Xử lý đơn #{{ order?.orderNumber ?? '...' }}</h1>
+        <span class="breadcrumb">Đơn hàng / #{{ order?.orderNumber }}</span>
+      </div>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <i class="fas fa-spinner fa-spin"></i> Đang tải thông tin đơn hàng...
+    </div>
+  } @else if (order) {
+    <div class="detail-grid">
+      <!-- Info Card -->
+      <div class="info-card">
+        <div class="card-title"><i class="fas fa-info-circle"></i> Chi tiết đơn</div>
+        <div class="info-row">
+          <span class="label">Mã đơn:</span>
+          <span class="value td-primary">{{ order.orderNumber }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Trạng thái:</span>
+          <span [class]="statusClass(order.status)">{{ order.status }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Thanh toán:</span>
+          <span class="value">{{ order.paymentMethod }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Ngày đặt:</span>
+          <span class="value">{{ formatDate(order.createdAt) }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Địa chỉ giao hàng:</span>
+          <span class="value">{{ order.shippingAddress }}</span>
+        </div>
+      </div>
+
+      <!-- Items Card -->
+      <div class="items-card">
+        <div class="card-title">
+          <i class="fas fa-boxes"></i> Sản phẩm trong đơn ({{ order.items.length }})
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Tên sản phẩm</th>
+              <th class="td-center">SL</th>
+              <th class="td-price">Đơn giá</th>
+              <th class="td-price">Thành tiền</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of order.items; track item.productId) {
+              <tr>
+                <td>{{ item.productName }}</td>
+                <td class="td-center">{{ item.quantity }}</td>
+                <td class="td-price">{{ formatPrice(item.unitPrice) }}</td>
+                <td class="td-price">{{ formatPrice(item.subtotal) }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align: right; font-weight: 700">Tổng thu:</td>
+              <td class="td-price grand-total">{{ formatPrice(order.totalAmount) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  }
+</div>
