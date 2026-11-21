@@ -1,0 +1,23 @@
+# Local environment files and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Cloud provider credentials
+.aws/
+**/.aws/
+
+# Private keys and certificates
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Local secret directories
+secrets/
+**/secrets/
