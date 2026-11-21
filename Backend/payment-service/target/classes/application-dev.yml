@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/payment_db
-    username: payment_user
-    password: payment_pass
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:change-me}"
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

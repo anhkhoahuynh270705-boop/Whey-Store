@@ -2,8 +2,8 @@
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/inventory_db}
-    username: postgres
-    password: ${DB_PASSWORD:Khoa123}
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:change-me}"
 
   data:
     redis:

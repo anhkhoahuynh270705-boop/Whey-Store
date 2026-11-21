@@ -8,13 +8,13 @@ keycloak:
   admin-realm: master
   admin-client-id: admin-cli
   admin-username: admin
-  admin-password: admin
+  admin-password: "${KEYCLOAK_ADMIN_PASSWORD:change-me}"
 
 app:
   datasource:
     url: ${DB_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/keycloak_db}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:Khoa123}
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:change-me}"
 
 spring:
   application:

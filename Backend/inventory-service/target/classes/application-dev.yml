@@ -7,8 +7,8 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/inventory_db
-    username: inventory_user
-    password: inventory_pass
+    username: "${DB_USERNAME:postgres}"
+    password: "${DB_PASSWORD:change-me}"
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

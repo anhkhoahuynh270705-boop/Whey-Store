@@ -1,12 +1,22 @@
+-- Read per-service passwords from the Postgres container environment
+\getenv product_db_password PRODUCT_DB_PASSWORD
+\getenv inventory_db_password INVENTORY_DB_PASSWORD
+\getenv order_db_password ORDER_DB_PASSWORD
+\getenv payment_db_password PAYMENT_DB_PASSWORD
+\getenv workflow_db_password WORKFLOW_DB_PASSWORD
+\getenv keycloak_db_password KEYCLOAK_DB_PASSWORD
+\getenv notification_db_password NOTIFICATION_DB_PASSWORD
+\getenv report_db_password REPORT_DB_PASSWORD
+
 -- Create application users first
-CREATE USER product_user   WITH PASSWORD 'product_pass';
-CREATE USER inventory_user WITH PASSWORD 'inventory_pass';
-CREATE USER order_user     WITH PASSWORD 'order_pass';
-CREATE USER payment_user   WITH PASSWORD 'payment_pass';
-CREATE USER workflow_user  WITH PASSWORD 'workflow_pass';
-CREATE USER keycloak_user  WITH PASSWORD 'keycloak_pass';
-CREATE USER notification_user WITH PASSWORD 'notification_pass';
-CREATE USER report_user    WITH PASSWORD 'report_pass';
+CREATE USER product_user WITH PASSWORD :'product_db_password';
+CREATE USER inventory_user WITH PASSWORD :'inventory_db_password';
+CREATE USER order_user WITH PASSWORD :'order_db_password';
+CREATE USER payment_user WITH PASSWORD :'payment_db_password';
+CREATE USER workflow_user WITH PASSWORD :'workflow_db_password';
+CREATE USER keycloak_user WITH PASSWORD :'keycloak_db_password';
+CREATE USER notification_user WITH PASSWORD :'notification_db_password';
+CREATE USER report_user WITH PASSWORD :'report_db_password';
 
 -- Create databases owned by their respective users
 CREATE DATABASE product_db   OWNER product_user;

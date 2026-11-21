@@ -15,7 +15,7 @@ camunda:
   bpm:
     admin-user:
       id: admin
-      password: admin
+      password: "${DB_PASSWORD:change-me}"
       first-name: Admin
     history-level: audit
     auto-deployment-enabled: true
