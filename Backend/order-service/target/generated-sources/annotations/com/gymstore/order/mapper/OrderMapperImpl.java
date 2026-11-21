@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-11-16T13:49:19+0700",
+    date = "2026-11-20T09:37:07+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.200.v20261008-1115, environment: Java 25.0.4.1 (Eclipse Adoptium)"
 )
 @Component
@@ -117,10 +117,10 @@ public class OrderMapperImpl implements OrderMapper {
         Order order = new Order();
 
         if ( req != null ) {
-            order.setUserId( req.userId() );
-            order.setTotalAmount( req.totalAmount() );
-            order.setShippingAddress( req.shippingAddress() );
             order.setPaymentMethod( req.paymentMethod() );
+            order.setShippingAddress( req.shippingAddress() );
+            order.setTotalAmount( req.totalAmount() );
+            order.setUserId( req.userId() );
         }
         order.setOrderNumber( orderNumber );
         order.setStatus( com.gymstore.order.enums.OrderStatus.PENDING );

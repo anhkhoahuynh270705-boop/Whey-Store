@@ -1,327 +1,338 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
-                  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
-                  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
-                  xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  id="Definitions_Purchase"
-                  targetNamespace="http://gymstore.com/bpmn"
-                  exporter="Camunda Modeler"
-                  exporterVersion="5.x">
-
-  <bpmn:process id="purchase-product-process" name="GymStore Purchase Process" isExecutable="true"
-                camunda:historyTimeToLive="30">
-    <bpmn:startEvent id="StartEvent_Order" name="Khách đặt hàng">
-      <bpmn:outgoing>Flow_to_Validate</bpmn:outgoing>
-    </bpmn:startEvent>
-    <bpmn:serviceTask id="Task_ValidateOrder" name="Validate đơn hàng"
-                      camunda:delegateExpression="${validateOrderDelegate}">
-      <bpmn:incoming>Flow_to_Validate</bpmn:incoming>
-      <bpmn:outgoing>Flow_Validate_to_Reserve</bpmn:outgoing>
-      <bpmn:boundaryEvent id="BoundaryError_Validate" attachedToRef="Task_ValidateOrder">
-        <bpmn:outgoing>Flow_Validate_Error</bpmn:outgoing>
-        <bpmn:errorEventDefinition errorRef="Error_ValidationFailed"/>
-      </bpmn:boundaryEvent>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_ReserveStock" name="Giữ hàng (Reserve stock)"
-                      camunda:delegateExpression="${reserveStockDelegate}">
-      <bpmn:incoming>Flow_Validate_to_Reserve</bpmn:incoming>
-      <bpmn:outgoing>Flow_Reserve_to_GW</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:exclusiveGateway id="GW_StockAvailable" name="Đủ hàng?">
-      <bpmn:incoming>Flow_Reserve_to_GW</bpmn:incoming>
-      <bpmn:outgoing>Flow_StockOK</bpmn:outgoing>
-      <bpmn:outgoing>Flow_StockKO</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_CreateOrder" name="Tạo đơn hàng (PENDING)"
-                      camunda:delegateExpression="${createOrderDelegate}">
-      <bpmn:incoming>Flow_StockOK</bpmn:incoming>
-      <bpmn:outgoing>Flow_Create_to_Payment</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_ProcessPayment" name="Xử lý thanh toán"
-                      camunda:delegateExpression="${processPaymentDelegate}">
-      <bpmn:incoming>Flow_Create_to_Payment</bpmn:incoming>
-      <bpmn:outgoing>Flow_Payment_to_GW</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:boundaryEvent id="BoundaryTimer_Payment" cancelActivity="true" attachedToRef="Task_ProcessPayment">
-      <bpmn:outgoing>Flow_Timer_to_Compensate</bpmn:outgoing>
-      <bpmn:timerEventDefinition>
-        <bpmn:timeDuration>PT15M</bpmn:timeDuration>
-      </bpmn:timerEventDefinition>
-    </bpmn:boundaryEvent>
-    <bpmn:exclusiveGateway id="GW_PaymentOK" name="Thanh toán thành công?">
-      <bpmn:incoming>Flow_Payment_to_GW</bpmn:incoming>
-      <bpmn:outgoing>Flow_PayOK</bpmn:outgoing>
-      <bpmn:outgoing>Flow_PayKO</bpmn:outgoing>
-    </bpmn:exclusiveGateway>
-    <bpmn:serviceTask id="Task_CommitStock" name="Trừ kho chính thức"
-                      camunda:delegateExpression="${commitStockDelegate}">
-      <bpmn:incoming>Flow_PayOK</bpmn:incoming>
-      <bpmn:outgoing>Flow_Commit_to_UpdateOrder</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_UpdateOrderCompleted" name="Cập nhật đơn COMPLETED"
-                      camunda:delegateExpression="${updateOrderCompletedDelegate}">
-      <bpmn:incoming>Flow_Commit_to_UpdateOrder</bpmn:incoming>
-      <bpmn:outgoing>Flow_UpdateOrder_to_Kafka</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_PublishCompleted" name="Publish order.completed"
-                      camunda:delegateExpression="${publishOrderCompletedDelegate}">
-      <bpmn:incoming>Flow_UpdateOrder_to_Kafka</bpmn:incoming>
-      <bpmn:outgoing>Flow_to_EndSuccess</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_ReleaseStock_PayFail" name="Hoàn kho (thanh toán thất bại)"
-                      camunda:delegateExpression="${releaseStockDelegate}">
-      <bpmn:incoming>Flow_PayKO</bpmn:incoming>
-      <bpmn:outgoing>Flow_Release_to_CancelOrder_PayFail</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_CancelOrder_PayFail" name="Hủy đơn (thanh toán thất bại)"
-                      camunda:delegateExpression="${cancelOrderDelegate}">
-      <bpmn:incoming>Flow_Release_to_CancelOrder_PayFail</bpmn:incoming>
-      <bpmn:outgoing>Flow_CancelPayFail_to_Kafka</bpmn:outgoing>
-      <bpmn:dataInputAssociation>
-        <bpmn:assignment>
-          <bpmn:from><bpmn:formalExpression>"PAYMENT_FAILED"</bpmn:formalExpression></bpmn:from>
-          <bpmn:to><bpmn:formalExpression>cancelReason</bpmn:formalExpression></bpmn:to>
-        </bpmn:assignment>
-      </bpmn:dataInputAssociation>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_ReleaseStock_Timer" name="Hoàn kho (timeout)"
-                      camunda:delegateExpression="${releaseStockDelegate}">
-      <bpmn:incoming>Flow_Timer_to_Compensate</bpmn:incoming>
-      <bpmn:outgoing>Flow_Timer_Release_to_Cancel</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_CancelOrder_Timer" name="Hủy đơn (timeout)"
-                      camunda:delegateExpression="${cancelOrderDelegate}">
-      <bpmn:incoming>Flow_Timer_Release_to_Cancel</bpmn:incoming>
-      <bpmn:outgoing>Flow_Timer_Cancel_to_Kafka</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_CancelOrder_NoStock" name="Hủy đơn (hết hàng)"
-                      camunda:delegateExpression="${cancelOrderNoStockDelegate}">
-      <bpmn:incoming>Flow_StockKO</bpmn:incoming>
-      <bpmn:outgoing>Flow_NoStock_to_End</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_CancelOrder_Validate" name="Hủy đơn (validate lỗi)"
-                      camunda:delegateExpression="${cancelOrderDelegate}">
-      <bpmn:incoming>Flow_Validate_Error</bpmn:incoming>
-      <bpmn:outgoing>Flow_Validate_Cancel_to_End</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:serviceTask id="Task_PublishCancelled_PayFail" name="Publish order.cancelled (thanh toán lỗi)"
-                      camunda:delegateExpression="${publishOrderCancelledDelegate}">
-      <bpmn:incoming>Flow_CancelPayFail_to_Kafka</bpmn:incoming>
-      <bpmn:outgoing>Flow_Publish_Cancel_PayFail_to_End</bpmn:outgoing>
-    </bpmn:serviceTask>
-
-    <bpmn:serviceTask id="Task_PublishCancelled_Timer" name="Publish order.cancelled (timeout)"
-                      camunda:delegateExpression="${publishOrderCancelledDelegate}">
-      <bpmn:incoming>Flow_Timer_Cancel_to_Kafka</bpmn:incoming>
-      <bpmn:outgoing>Flow_Publish_Cancel_Timer_to_End</bpmn:outgoing>
-    </bpmn:serviceTask>
-    <bpmn:endEvent id="EndEvent_Success" name="Mua hàng thành công">
-      <bpmn:incoming>Flow_to_EndSuccess</bpmn:incoming>
-    </bpmn:endEvent>
-
-    <bpmn:endEvent id="EndEvent_CancelNoStock" name="Hủy – hết hàng">
-      <bpmn:incoming>Flow_NoStock_to_End</bpmn:incoming>
-      <bpmn:errorEventDefinition errorRef="Error_OutOfStock"/>
-    </bpmn:endEvent>
-
-    <bpmn:endEvent id="EndEvent_CancelValidate" name="Hủy – lỗi dữ liệu">
-      <bpmn:incoming>Flow_Validate_Cancel_to_End</bpmn:incoming>
-    </bpmn:endEvent>
-
-    <bpmn:endEvent id="EndEvent_CancelPayFail" name="Hủy – thanh toán thất bại">
-      <bpmn:incoming>Flow_Publish_Cancel_PayFail_to_End</bpmn:incoming>
-    </bpmn:endEvent>
-
-    <bpmn:endEvent id="EndEvent_CancelTimer" name="Hủy – quá thời hạn">
-      <bpmn:incoming>Flow_Publish_Cancel_Timer_to_End</bpmn:incoming>
-    </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_to_Validate" sourceRef="StartEvent_Order" targetRef="Task_ValidateOrder"/>
-    <bpmn:sequenceFlow id="Flow_Validate_to_Reserve" sourceRef="Task_ValidateOrder" targetRef="Task_ReserveStock"/>
-    <bpmn:sequenceFlow id="Flow_Validate_Error" sourceRef="BoundaryError_Validate" targetRef="Task_CancelOrder_Validate"/>
-    <bpmn:sequenceFlow id="Flow_Validate_Cancel_to_End" sourceRef="Task_CancelOrder_Validate" targetRef="EndEvent_CancelValidate"/>
-    <bpmn:sequenceFlow id="Flow_Reserve_to_GW" sourceRef="Task_ReserveStock" targetRef="GW_StockAvailable"/>
-    <bpmn:sequenceFlow id="Flow_StockOK" name="Đủ hàng" sourceRef="GW_StockAvailable" targetRef="Task_CreateOrder">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${stockReserved == true}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_StockKO" name="Hết hàng" sourceRef="GW_StockAvailable" targetRef="Task_CancelOrder_NoStock">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${stockReserved == false}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_NoStock_to_End" sourceRef="Task_CancelOrder_NoStock" targetRef="EndEvent_CancelNoStock"/>
-    <bpmn:sequenceFlow id="Flow_Create_to_Payment" sourceRef="Task_CreateOrder" targetRef="Task_ProcessPayment"/>
-    <bpmn:sequenceFlow id="Flow_Payment_to_GW" sourceRef="Task_ProcessPayment" targetRef="GW_PaymentOK"/>
-    <bpmn:sequenceFlow id="Flow_PayOK" name="Thành công" sourceRef="GW_PaymentOK" targetRef="Task_CommitStock">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentSuccess == true}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_PayKO" name="Thất bại" sourceRef="GW_PaymentOK" targetRef="Task_ReleaseStock_PayFail">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${paymentSuccess == false}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
-    <bpmn:sequenceFlow id="Flow_Timer_to_Compensate" sourceRef="BoundaryTimer_Payment" targetRef="Task_ReleaseStock_Timer"/>
-    <bpmn:sequenceFlow id="Flow_Timer_Release_to_Cancel" sourceRef="Task_ReleaseStock_Timer" targetRef="Task_CancelOrder_Timer"/>
-    <bpmn:sequenceFlow id="Flow_Timer_Cancel_to_Kafka" sourceRef="Task_CancelOrder_Timer" targetRef="Task_PublishCancelled_Timer"/>
-    <bpmn:sequenceFlow id="Flow_Publish_Cancel_Timer_to_End" sourceRef="Task_PublishCancelled_Timer" targetRef="EndEvent_CancelTimer"/>
-    <bpmn:sequenceFlow id="Flow_Commit_to_UpdateOrder" sourceRef="Task_CommitStock" targetRef="Task_UpdateOrderCompleted"/>
-    <bpmn:sequenceFlow id="Flow_UpdateOrder_to_Kafka" sourceRef="Task_UpdateOrderCompleted" targetRef="Task_PublishCompleted"/>
-    <bpmn:sequenceFlow id="Flow_to_EndSuccess" sourceRef="Task_PublishCompleted" targetRef="EndEvent_Success"/>
-    <bpmn:sequenceFlow id="Flow_Release_to_CancelOrder_PayFail" sourceRef="Task_ReleaseStock_PayFail" targetRef="Task_CancelOrder_PayFail"/>
-    <bpmn:sequenceFlow id="Flow_CancelPayFail_to_Kafka" sourceRef="Task_CancelOrder_PayFail" targetRef="Task_PublishCancelled_PayFail"/>
-    <bpmn:sequenceFlow id="Flow_Publish_Cancel_PayFail_to_End" sourceRef="Task_PublishCancelled_PayFail" targetRef="EndEvent_CancelPayFail"/>
-  </bpmn:process>
-  <bpmn:error id="Error_ValidationFailed" name="VALIDATION_FAILED" errorCode="VALIDATION_FAILED"/>
-  <bpmn:error id="Error_OutOfStock" name="OUT_OF_STOCK" errorCode="OUT_OF_STOCK"/>
-  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="purchase-product-process">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" id="Definitions_Purchase" targetNamespace="http://gymstore.com/bpmn" exporter="Camunda Modeler" exporterVersion="5.32.0">
+  <error id="Error_ValidationFailed" name="VALIDATION_FAILED" errorCode="VALIDATION_FAILED" />
+  <error id="Error_OutOfStock" name="OUT_OF_STOCK" errorCode="OUT_OF_STOCK" />
+  <process id="purchase-product-process" name="GymStore Purchase Process" isExecutable="true" camunda:historyTimeToLive="30">
+    <startEvent id="StartEvent_Order" name="Khach dat hang">
+      <outgoing>Flow_to_Validate</outgoing>
+    </startEvent>
+    <serviceTask id="Task_ValidateOrder" name="Validate don hang" camunda:delegateExpression="${validateOrderDelegate}">
+      <incoming>Flow_to_Validate</incoming>
+      <outgoing>Flow_Validate_to_Reserve</outgoing>
+    </serviceTask>
+    <boundaryEvent id="BoundaryError_Validate" attachedToRef="Task_ValidateOrder">
+      <outgoing>Flow_Validate_Error</outgoing>
+      <errorEventDefinition errorRef="Error_ValidationFailed" />
+    </boundaryEvent>
+    <serviceTask id="Task_ReserveStock" name="Giu hang" camunda:delegateExpression="${reserveStockDelegate}">
+      <incoming>Flow_Validate_to_Reserve</incoming>
+      <outgoing>Flow_Reserve_to_GW</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="GW_StockAvailable" name="Du hang?">
+      <incoming>Flow_Reserve_to_GW</incoming>
+      <outgoing>Flow_StockOK</outgoing>
+      <outgoing>Flow_StockKO</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="Task_CreateOrder" name="Tao don hang PENDING" camunda:delegateExpression="${createOrderDelegate}">
+      <incoming>Flow_StockOK</incoming>
+      <outgoing>Flow_Create_to_Payment</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_ProcessPayment" name="Xu ly thanh toan" camunda:delegateExpression="${processPaymentDelegate}">
+      <incoming>Flow_Create_to_Payment</incoming>
+      <outgoing>Flow_Payment_to_GW</outgoing>
+    </serviceTask>
+    <boundaryEvent id="BoundaryTimer_Payment" attachedToRef="Task_ProcessPayment">
+      <outgoing>Flow_Timer_to_Compensate</outgoing>
+      <timerEventDefinition>
+        <timeDuration>PT15M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <exclusiveGateway id="GW_PaymentOK" name="Thanh toan thanh cong?">
+      <incoming>Flow_Payment_to_GW</incoming>
+      <outgoing>Flow_PayOK</outgoing>
+      <outgoing>Flow_PayKO</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="Task_CommitStock" name="Tru kho chinh thuc" camunda:delegateExpression="${commitStockDelegate}">
+      <incoming>Flow_PayOK</incoming>
+      <outgoing>Flow_Commit_to_UpdateOrder</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_UpdateOrderCompleted" name="Cap nhat don COMPLETED" camunda:delegateExpression="${updateOrderCompletedDelegate}">
+      <incoming>Flow_Commit_to_UpdateOrder</incoming>
+      <outgoing>Flow_UpdateOrder_to_Kafka</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_PublishCompleted" name="Publish order.completed" camunda:delegateExpression="${publishOrderCompletedDelegate}">
+      <incoming>Flow_UpdateOrder_to_Kafka</incoming>
+      <outgoing>Flow_to_EndSuccess</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_Success" name="Mua hang thanh cong">
+      <incoming>Flow_to_EndSuccess</incoming>
+    </endEvent>
+    <serviceTask id="Task_ReleaseStock_PayFail" name="Hoan kho - thanh toan that bai" camunda:delegateExpression="${releaseStockDelegate}">
+      <incoming>Flow_PayKO</incoming>
+      <outgoing>Flow_Release_to_CancelOrder_PayFail</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_CancelOrder_PayFail" name="Huy don - thanh toan that bai" camunda:delegateExpression="${cancelOrderDelegate}">
+      <incoming>Flow_Release_to_CancelOrder_PayFail</incoming>
+      <outgoing>Flow_CancelPayFail_to_Kafka</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_PublishCancelled_PayFail" name="Publish order.cancelled - thanh toan loi" camunda:delegateExpression="${publishOrderCancelledDelegate}">
+      <incoming>Flow_CancelPayFail_to_Kafka</incoming>
+      <outgoing>Flow_Publish_Cancel_PayFail_to_End</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_CancelPayFail" name="Huy - thanh toan that bai">
+      <incoming>Flow_Publish_Cancel_PayFail_to_End</incoming>
+    </endEvent>
+    <serviceTask id="Task_ReleaseStock_Timer" name="Hoan kho - timeout" camunda:delegateExpression="${releaseStockDelegate}">
+      <incoming>Flow_Timer_to_Compensate</incoming>
+      <outgoing>Flow_Timer_Release_to_Cancel</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_CancelOrder_Timer" name="Huy don - timeout" camunda:delegateExpression="${cancelOrderDelegate}">
+      <incoming>Flow_Timer_Release_to_Cancel</incoming>
+      <outgoing>Flow_Timer_Cancel_to_Kafka</outgoing>
+    </serviceTask>
+    <serviceTask id="Task_PublishCancelled_Timer" name="Publish order.cancelled - timeout" camunda:delegateExpression="${publishOrderCancelledDelegate}">
+      <incoming>Flow_Timer_Cancel_to_Kafka</incoming>
+      <outgoing>Flow_Publish_Cancel_Timer_to_End</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_CancelTimer" name="Huy - qua thoi han">
+      <incoming>Flow_Publish_Cancel_Timer_to_End</incoming>
+    </endEvent>
+    <serviceTask id="Task_CancelOrder_NoStock" name="Huy don - het hang" camunda:delegateExpression="${cancelOrderNoStockDelegate}">
+      <incoming>Flow_StockKO</incoming>
+      <outgoing>Flow_NoStock_to_End</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_CancelNoStock" name="Huy - het hang">
+      <incoming>Flow_NoStock_to_End</incoming>
+    </endEvent>
+    <serviceTask id="Task_CancelOrder_Validate" name="Huy don - validate loi" camunda:delegateExpression="${cancelOrderDelegate}">
+      <incoming>Flow_Validate_Error</incoming>
+      <outgoing>Flow_Validate_Cancel_to_End</outgoing>
+    </serviceTask>
+    <endEvent id="EndEvent_CancelValidate" name="Huy - loi du lieu">
+      <incoming>Flow_Validate_Cancel_to_End</incoming>
+    </endEvent>
+    <sequenceFlow id="Flow_to_Validate" sourceRef="StartEvent_Order" targetRef="Task_ValidateOrder" />
+    <sequenceFlow id="Flow_Validate_to_Reserve" sourceRef="Task_ValidateOrder" targetRef="Task_ReserveStock" />
+    <sequenceFlow id="Flow_Validate_Error" sourceRef="BoundaryError_Validate" targetRef="Task_CancelOrder_Validate" />
+    <sequenceFlow id="Flow_Validate_Cancel_to_End" sourceRef="Task_CancelOrder_Validate" targetRef="EndEvent_CancelValidate" />
+    <sequenceFlow id="Flow_Reserve_to_GW" sourceRef="Task_ReserveStock" targetRef="GW_StockAvailable" />
+    <sequenceFlow id="Flow_StockOK" name="Du hang" sourceRef="GW_StockAvailable" targetRef="Task_CreateOrder">
+      <conditionExpression xsi:type="tFormalExpression">${stockReserved == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_StockKO" name="Het hang" sourceRef="GW_StockAvailable" targetRef="Task_CancelOrder_NoStock">
+      <conditionExpression xsi:type="tFormalExpression">${stockReserved == false}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_NoStock_to_End" sourceRef="Task_CancelOrder_NoStock" targetRef="EndEvent_CancelNoStock" />
+    <sequenceFlow id="Flow_Create_to_Payment" sourceRef="Task_CreateOrder" targetRef="Task_ProcessPayment" />
+    <sequenceFlow id="Flow_Payment_to_GW" sourceRef="Task_ProcessPayment" targetRef="GW_PaymentOK" />
+    <sequenceFlow id="Flow_PayOK" name="Thanh cong" sourceRef="GW_PaymentOK" targetRef="Task_CommitStock">
+      <conditionExpression xsi:type="tFormalExpression">${paymentSuccess == true}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_PayKO" name="That bai" sourceRef="GW_PaymentOK" targetRef="Task_ReleaseStock_PayFail">
+      <conditionExpression xsi:type="tFormalExpression">${paymentSuccess == false}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_Timer_to_Compensate" sourceRef="BoundaryTimer_Payment" targetRef="Task_ReleaseStock_Timer" />
+    <sequenceFlow id="Flow_Timer_Release_to_Cancel" sourceRef="Task_ReleaseStock_Timer" targetRef="Task_CancelOrder_Timer" />
+    <sequenceFlow id="Flow_Timer_Cancel_to_Kafka" sourceRef="Task_CancelOrder_Timer" targetRef="Task_PublishCancelled_Timer" />
+    <sequenceFlow id="Flow_Publish_Cancel_Timer_to_End" sourceRef="Task_PublishCancelled_Timer" targetRef="EndEvent_CancelTimer" />
+    <sequenceFlow id="Flow_Commit_to_UpdateOrder" sourceRef="Task_CommitStock" targetRef="Task_UpdateOrderCompleted" />
+    <sequenceFlow id="Flow_UpdateOrder_to_Kafka" sourceRef="Task_UpdateOrderCompleted" targetRef="Task_PublishCompleted" />
+    <sequenceFlow id="Flow_to_EndSuccess" sourceRef="Task_PublishCompleted" targetRef="EndEvent_Success" />
+    <sequenceFlow id="Flow_Release_to_CancelOrder_PayFail" sourceRef="Task_ReleaseStock_PayFail" targetRef="Task_CancelOrder_PayFail" />
+    <sequenceFlow id="Flow_CancelPayFail_to_Kafka" sourceRef="Task_CancelOrder_PayFail" targetRef="Task_PublishCancelled_PayFail" />
+    <sequenceFlow id="Flow_Publish_Cancel_PayFail_to_End" sourceRef="Task_PublishCancelled_PayFail" targetRef="EndEvent_CancelPayFail" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Purchase">
+    <bpmndi:BPMNPlane id="BPMNPlane_Purchase" bpmnElement="purchase-product-process">
       <bpmndi:BPMNShape id="StartEvent_Order_di" bpmnElement="StartEvent_Order">
-        <dc:Bounds x="152" y="302" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="136" y="345" width="68" height="27"/></bpmndi:BPMNLabel>
+        <dc:Bounds x="152" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="131" y="225" width="78" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_ValidateOrder_di" bpmnElement="Task_ValidateOrder">
-        <dc:Bounds x="240" y="280" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BoundaryError_Validate_di" bpmnElement="BoundaryError_Validate">
-        <dc:Bounds x="322" y="342" width="36" height="36"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CancelOrder_Validate_di" bpmnElement="Task_CancelOrder_Validate">
-        <dc:Bounds x="310" y="440" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_CancelValidate_di" bpmnElement="EndEvent_CancelValidate">
-        <dc:Bounds x="362" y="562" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="340" y="605" width="80" height="27"/></bpmndi:BPMNLabel>
+        <dc:Bounds x="240" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_ReserveStock_di" bpmnElement="Task_ReserveStock">
-        <dc:Bounds x="400" y="280" width="100" height="80"/>
+        <dc:Bounds x="390" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="GW_StockAvailable_di" bpmnElement="GW_StockAvailable" isMarkerVisible="true">
-        <dc:Bounds x="555" y="295" width="50" height="50"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="547" y="352" width="66" height="14"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CancelOrder_NoStock_di" bpmnElement="Task_CancelOrder_NoStock">
-        <dc:Bounds x="540" y="440" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_CancelNoStock_di" bpmnElement="EndEvent_CancelNoStock">
-        <dc:Bounds x="572" y="562" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="547" y="605" width="86" height="27"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CreateOrder_di" bpmnElement="Task_CreateOrder">
-        <dc:Bounds x="660" y="280" width="100" height="80"/>
+        <dc:Bounds x="540" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="540" y="145" width="50" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_ProcessPayment_di" bpmnElement="Task_ProcessPayment">
-        <dc:Bounds x="820" y="280" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BoundaryTimer_Payment_di" bpmnElement="BoundaryTimer_Payment">
-        <dc:Bounds x="902" y="342" width="36" height="36"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_ReleaseStock_Timer_di" bpmnElement="Task_ReleaseStock_Timer">
-        <dc:Bounds x="884" y="440" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CancelOrder_Timer_di" bpmnElement="Task_CancelOrder_Timer">
-        <dc:Bounds x="884" y="570" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_PublishCancelled_Timer_di" bpmnElement="Task_PublishCancelled_Timer">
-        <dc:Bounds x="884" y="700" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_CancelTimer_di" bpmnElement="EndEvent_CancelTimer">
-        <dc:Bounds x="916" y="822" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="894" y="865" width="80" height="27"/></bpmndi:BPMNLabel>
+        <dc:Bounds x="790" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="GW_PaymentOK_di" bpmnElement="GW_PaymentOK" isMarkerVisible="true">
-        <dc:Bounds x="985" y="295" width="50" height="50"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="967" y="352" width="86" height="27"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_ReleaseStock_PayFail_di" bpmnElement="Task_ReleaseStock_PayFail">
-        <dc:Bounds x="980" y="440" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CancelOrder_PayFail_di" bpmnElement="Task_CancelOrder_PayFail">
-        <dc:Bounds x="980" y="570" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_PublishCancelled_PayFail_di" bpmnElement="Task_PublishCancelled_PayFail">
-        <dc:Bounds x="980" y="700" width="100" height="80"/>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_CancelPayFail_di" bpmnElement="EndEvent_CancelPayFail">
-        <dc:Bounds x="1012" y="822" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="986" y="865" width="88" height="27"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Task_CommitStock_di" bpmnElement="Task_CommitStock">
-        <dc:Bounds x="1100" y="280" width="100" height="80"/>
+        <dc:Bounds x="940" y="175" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="915" y="122" width="100" height="40" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_UpdateOrderCompleted_di" bpmnElement="Task_UpdateOrderCompleted">
-        <dc:Bounds x="1260" y="280" width="100" height="80"/>
+        <dc:Bounds x="1190" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Task_PublishCompleted_di" bpmnElement="Task_PublishCompleted">
-        <dc:Bounds x="1420" y="280" width="100" height="80"/>
+        <dc:Bounds x="1340" y="160" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_Success_di" bpmnElement="EndEvent_Success">
-        <dc:Bounds x="1572" y="302" width="36" height="36"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="1550" y="345" width="80" height="27"/></bpmndi:BPMNLabel>
+        <dc:Bounds x="1490" y="182" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1469" y="225" width="78" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <!-- Sequence Flow edges -->
+      <bpmndi:BPMNShape id="Task_ReleaseStock_PayFail_di" bpmnElement="Task_ReleaseStock_PayFail">
+        <dc:Bounds x="915" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CancelOrder_PayFail_di" bpmnElement="Task_CancelOrder_PayFail">
+        <dc:Bounds x="1065" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PublishCancelled_PayFail_di" bpmnElement="Task_PublishCancelled_PayFail">
+        <dc:Bounds x="1215" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CancelPayFail_di" bpmnElement="EndEvent_CancelPayFail">
+        <dc:Bounds x="1365" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1346" y="365" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReleaseStock_Timer_di" bpmnElement="Task_ReleaseStock_Timer">
+        <dc:Bounds x="790" y="480" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CancelOrder_Timer_di" bpmnElement="Task_CancelOrder_Timer">
+        <dc:Bounds x="940" y="480" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PublishCancelled_Timer_di" bpmnElement="Task_PublishCancelled_Timer">
+        <dc:Bounds x="1090" y="480" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CancelTimer_di" bpmnElement="EndEvent_CancelTimer">
+        <dc:Bounds x="1240" y="502" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1221" y="545" width="74" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CancelOrder_NoStock_di" bpmnElement="Task_CancelOrder_NoStock">
+        <dc:Bounds x="515" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CancelNoStock_di" bpmnElement="EndEvent_CancelNoStock">
+        <dc:Bounds x="667" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="651" y="365" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CancelOrder_Validate_di" bpmnElement="Task_CancelOrder_Validate">
+        <dc:Bounds x="240" y="300" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_CancelValidate_di" bpmnElement="EndEvent_CancelValidate">
+        <dc:Bounds x="392" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="376" y="365" width="68" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CommitStock_di" bpmnElement="Task_CommitStock">
+        <dc:Bounds x="1060" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateOrder_di" bpmnElement="Task_CreateOrder">
+        <dc:Bounds x="660" y="160" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryTimer_Payment_di" bpmnElement="BoundaryTimer_Payment">
+        <dc:Bounds x="822" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BoundaryError_Validate_di" bpmnElement="BoundaryError_Validate">
+        <dc:Bounds x="272" y="222" width="36" height="36" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_to_Validate_di" bpmnElement="Flow_to_Validate">
-        <di:waypoint x="188" y="320"/><di:waypoint x="240" y="320"/>
+        <di:waypoint x="188" y="200" />
+        <di:waypoint x="240" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Validate_to_Reserve_di" bpmnElement="Flow_Validate_to_Reserve">
-        <di:waypoint x="340" y="320"/><di:waypoint x="400" y="320"/>
+        <di:waypoint x="340" y="200" />
+        <di:waypoint x="390" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Validate_Error_di" bpmnElement="Flow_Validate_Error">
-        <di:waypoint x="340" y="378"/><di:waypoint x="340" y="440"/>
+        <di:waypoint x="290" y="258" />
+        <di:waypoint x="290" y="300" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Validate_Cancel_to_End_di" bpmnElement="Flow_Validate_Cancel_to_End">
-        <di:waypoint x="360" y="520"/><di:waypoint x="380" y="562"/>
+        <di:waypoint x="340" y="340" />
+        <di:waypoint x="392" y="340" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Reserve_to_GW_di" bpmnElement="Flow_Reserve_to_GW">
-        <di:waypoint x="500" y="320"/><di:waypoint x="555" y="320"/>
+        <di:waypoint x="490" y="200" />
+        <di:waypoint x="540" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_StockOK_di" bpmnElement="Flow_StockOK">
-        <di:waypoint x="605" y="320"/><di:waypoint x="660" y="320"/>
+        <di:waypoint x="590" y="200" />
+        <di:waypoint x="660" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="599" y="182" width="42" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_StockKO_di" bpmnElement="Flow_StockKO">
-        <di:waypoint x="580" y="345"/><di:waypoint x="580" y="440"/>
+        <di:waypoint x="565" y="225" />
+        <di:waypoint x="565" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="573" y="255" width="48" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_NoStock_to_End_di" bpmnElement="Flow_NoStock_to_End">
-        <di:waypoint x="590" y="520"/><di:waypoint x="590" y="562"/>
+        <di:waypoint x="615" y="340" />
+        <di:waypoint x="667" y="340" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Create_to_Payment_di" bpmnElement="Flow_Create_to_Payment">
-        <di:waypoint x="760" y="320"/><di:waypoint x="820" y="320"/>
+        <di:waypoint x="760" y="200" />
+        <di:waypoint x="790" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Payment_to_GW_di" bpmnElement="Flow_Payment_to_GW">
-        <di:waypoint x="920" y="320"/><di:waypoint x="985" y="320"/>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Timer_to_Compensate_di" bpmnElement="Flow_Timer_to_Compensate">
-        <di:waypoint x="920" y="378"/><di:waypoint x="934" y="440"/>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Timer_Release_to_Cancel_di" bpmnElement="Flow_Timer_Release_to_Cancel">
-        <di:waypoint x="934" y="520"/><di:waypoint x="934" y="570"/>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Timer_Cancel_to_Kafka_di" bpmnElement="Flow_Timer_Cancel_to_Kafka">
-        <di:waypoint x="934" y="650"/><di:waypoint x="934" y="700"/>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Publish_Cancel_Timer_to_End_di" bpmnElement="Flow_Publish_Cancel_Timer_to_End">
-        <di:waypoint x="934" y="780"/><di:waypoint x="934" y="822"/>
+        <di:waypoint x="890" y="200" />
+        <di:waypoint x="940" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_PayOK_di" bpmnElement="Flow_PayOK">
-        <di:waypoint x="1035" y="320"/><di:waypoint x="1100" y="320"/>
+        <di:waypoint x="990" y="200" />
+        <di:waypoint x="1060" y="200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="990" y="182" width="59" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_PayKO_di" bpmnElement="Flow_PayKO">
-        <di:waypoint x="1010" y="345"/><di:waypoint x="1030" y="440"/>
+        <di:waypoint x="965" y="225" />
+        <di:waypoint x="965" y="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="973" y="255" width="46" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Release_to_CancelOrder_PayFail_di" bpmnElement="Flow_Release_to_CancelOrder_PayFail">
-        <di:waypoint x="1030" y="520"/><di:waypoint x="1030" y="570"/>
+      <bpmndi:BPMNEdge id="Flow_Timer_to_Compensate_di" bpmnElement="Flow_Timer_to_Compensate">
+        <di:waypoint x="840" y="258" />
+        <di:waypoint x="840" y="480" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_CancelPayFail_to_Kafka_di" bpmnElement="Flow_CancelPayFail_to_Kafka">
-        <di:waypoint x="1030" y="650"/><di:waypoint x="1030" y="700"/>
+      <bpmndi:BPMNEdge id="Flow_Timer_Release_to_Cancel_di" bpmnElement="Flow_Timer_Release_to_Cancel">
+        <di:waypoint x="890" y="520" />
+        <di:waypoint x="940" y="520" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_Publish_Cancel_PayFail_to_End_di" bpmnElement="Flow_Publish_Cancel_PayFail_to_End">
-        <di:waypoint x="1030" y="780"/><di:waypoint x="1030" y="822"/>
+      <bpmndi:BPMNEdge id="Flow_Timer_Cancel_to_Kafka_di" bpmnElement="Flow_Timer_Cancel_to_Kafka">
+        <di:waypoint x="1040" y="520" />
+        <di:waypoint x="1090" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Publish_Cancel_Timer_to_End_di" bpmnElement="Flow_Publish_Cancel_Timer_to_End">
+        <di:waypoint x="1190" y="520" />
+        <di:waypoint x="1240" y="520" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_Commit_to_UpdateOrder_di" bpmnElement="Flow_Commit_to_UpdateOrder">
-        <di:waypoint x="1200" y="320"/><di:waypoint x="1260" y="320"/>
+        <di:waypoint x="1160" y="200" />
+        <di:waypoint x="1190" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_UpdateOrder_to_Kafka_di" bpmnElement="Flow_UpdateOrder_to_Kafka">
-        <di:waypoint x="1360" y="320"/><di:waypoint x="1420" y="320"/>
+        <di:waypoint x="1290" y="200" />
+        <di:waypoint x="1340" y="200" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_to_EndSuccess_di" bpmnElement="Flow_to_EndSuccess">
-        <di:waypoint x="1520" y="320"/><di:waypoint x="1572" y="320"/>
+        <di:waypoint x="1440" y="200" />
+        <di:waypoint x="1490" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Release_to_CancelOrder_PayFail_di" bpmnElement="Flow_Release_to_CancelOrder_PayFail">
+        <di:waypoint x="1015" y="340" />
+        <di:waypoint x="1065" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CancelPayFail_to_Kafka_di" bpmnElement="Flow_CancelPayFail_to_Kafka">
+        <di:waypoint x="1165" y="340" />
+        <di:waypoint x="1215" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Publish_Cancel_PayFail_to_End_di" bpmnElement="Flow_Publish_Cancel_PayFail_to_End">
+        <di:waypoint x="1315" y="340" />
+        <di:waypoint x="1365" y="340" />
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
-</bpmn:definitions>
+</definitions>

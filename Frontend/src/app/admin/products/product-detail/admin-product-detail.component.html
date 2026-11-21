@@ -1,5 +1,4 @@
 <div class="admin-page">
-
   <!-- Header -->
   <div class="page-header">
     <div class="header-left">
@@ -16,9 +15,7 @@
     </div>
     @if (product) {
       <div class="header-actions">
-        <button class="btn-edit" (click)="goEdit()">
-          <i class="fas fa-edit"></i> Chỉnh sửa
-        </button>
+        <button class="btn-edit" (click)="goEdit()"><i class="fas fa-edit"></i> Chỉnh sửa</button>
         <button class="btn-delete" (click)="deleteProduct()">
           <i class="fas fa-trash-alt"></i> Xoá
         </button>
@@ -27,16 +24,9 @@
   </div>
 
   @if (loading) {
-    <div class="page-loading">
-      <i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...
-    </div>
-  } @else if (errorMsg) {
-    <div class="alert alert-error">
-      <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
-    </div>
+    <div class="page-loading"><i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...</div>
   } @else if (product) {
     <div class="detail-layout">
-
       <!-- Left: Images -->
       <div class="detail-col img-col">
         <div class="form-card">
@@ -55,7 +45,8 @@
                   [class.selected]="img.imageUrl === selectedImage"
                   (click)="selectImage(img.imageUrl)"
                   class="thumb"
-                  alt="" />
+                  alt=""
+                />
               }
             </div>
           }
@@ -64,11 +55,14 @@
 
       <!-- Right: Info -->
       <div class="detail-col info-col">
-
         <!-- Status + badge -->
         <div class="form-card name-card">
           <div class="product-status">
-            <span [class]="product.status === 'ACTIVE' ? 'status-badge active' : 'status-badge inactive'">
+            <span
+              [class]="
+                product.status === 'ACTIVE' ? 'status-badge active' : 'status-badge inactive'
+              "
+            >
               {{ product.status === 'ACTIVE' ? 'Hoạt động' : 'Ẩn' }}
             </span>
             <span class="product-id">ID: #{{ product.id }}</span>
@@ -147,9 +141,7 @@
             <div class="description-text">{{ product.description }}</div>
           </div>
         }
-
       </div>
     </div>
   }
 </div>
-

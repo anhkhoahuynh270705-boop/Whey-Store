@@ -1,102 +1,56 @@
-$border: #1f2430;
-$text: #eef2f8;
-$muted: #6b7f96;
-$accent: #10b981;
+// ── Tokens ──────────────────────────────────────────
+$accent:   #10b981;
+$border:   #1f2430;
+$surface:  #161b26;
+$bg:       #0d1117;
+$text:     #eef2f8;
+$muted:    #6b7f96;
+$soft:     #a8bdd4;
+$warning:  #f59e0b;
+$danger:   #ef4444;
+
+// ── Page ────────────────────────────────────────────
+.staff-page { padding: 1.5rem; }
 
 .page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 24px; gap: 1rem;
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
+.header-left { display: flex; align-items: center; gap: 14px; }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
-  background: #151a24;
-  border: 1px solid $border;
-  border-radius: 8px;
-  color: $muted;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  &:hover {
-    color: $text;
-    background: #1f2430;
-  }
+  width: 36px; height: 36px; background: #1a2030; border: 1px solid $border;
+  border-radius: 8px; color: $muted; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.15s, background 0.15s;
+  &:hover { color: $text; background: $border; }
 }
 
-h1 {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: $text;
-  margin: 0 0 2px;
-  i {
-    color: $accent;
-    margin-right: 8px;
-  }
-}
-
-.breadcrumb {
-  font-size: 0.78rem;
-  color: $muted;
-}
+h1 { font-size: 1.3rem; font-weight: 700; color: $text; margin: 0 0 2px; i { color: $accent; margin-right: 8px; } }
+.breadcrumb { font-size: 0.78rem; color: $muted; }
 
 .detail-grid {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 20px;
-  align-items: start;
+  display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start;
+  @media (max-width: 900px) { grid-template-columns: 1fr; }
 }
 
-.info-card,
-.items-card {
-  background: #111620;
-  border: 1px solid $border;
-  border-radius: 12px;
-  padding: 20px;
+.info-card, .items-card {
+  background: #111620; border: 1px solid $border; border-radius: 12px; padding: 20px;
 }
 
 .card-title {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: $muted;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 16px;
-  i {
-    margin-right: 7px;
-    color: $accent;
-  }
+  font-size: 0.8rem; font-weight: 700; color: $muted;
+  text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px;
+  i { margin-right: 7px; color: $accent; }
 }
 
 .info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid $border;
-  font-size: 0.88rem;
-  &:last-child {
-    border-bottom: none;
-  }
-  .label {
-    color: $muted;
-  }
-  .value {
-    color: $text;
-    font-weight: 500;
-  }
+  display: flex; justify-content: space-between;
+  padding: 8px 0; border-bottom: 1px solid $border; font-size: 0.88rem;
+  &:last-child { border-bottom: none; }
+  .label { color: $muted; }
+  .value { color: $text; font-weight: 500; }
 }
 
-.grand-total {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #10b981;
-}
+.grand-total { font-size: 1.1rem; font-weight: 700; color: $accent; }

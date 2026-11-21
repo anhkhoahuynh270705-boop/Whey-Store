@@ -1,202 +1,323 @@
 @if (loading) {
   <div class="container loading-page">
     <div class="loading-row">
-      <i class="fas fa-spinner fa-spin"></i> Đang tải sản phẩm...
+      <i class="fas fa-spinner fa-spin"></i> Đang tải thông tin sản phẩm...
     </div>
   </div>
 }
 
 @if (product && !loading) {
   <div class="container product-detail">
-
     <!-- Breadcrumb -->
     <div class="breadcrumb">
-      <a routerLink="/home"><i class="fas fa-home"></i></a>
+      <a routerLink="/home"><i class="fas fa-home"></i> Trang chủ</a>
       <i class="fas fa-chevron-right sep"></i>
       <a routerLink="/products">Sản phẩm</a>
       <i class="fas fa-chevron-right sep"></i>
-      <span>{{ product.name }}</span>
+      <span class="curr-page">{{ product.name }}</span>
     </div>
 
-    <!-- ===== TOP: Images + Info ===== -->
     <div class="product-top">
-
-      <!-- LEFT: Gallery -->
       <div class="gallery-col">
-        <!-- Thumbnails dọc bên trái -->
-        @if (product.images.length > 1) {
-          <div class="thumb-col">
-            @for (img of product.images; track img.id) {
-              <button class="thumb" [class.active]="img.imageUrl === selectedImage"
-                      (click)="selectedImage = img.imageUrl">
-                <img [src]="img.imageUrl" [alt]="product.name" />
+        <div class="main-image-wrapper">
+          <div class="main-image" [class.zoomed]="zoomed" (click)="zoomed = !zoomed">
+            <img
+              [src]="
+                selectedImage ||
+                'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&auto=format&fit=crop&q=80'
+              "
+              [alt]="product.name"
+            />
+            <div class="zoom-hint">
+              <i class="fas" [ngClass]="zoomed ? 'fa-search-minus' : 'fa-search-plus'"></i>
+            </div>
+            @if (product.salePrice && discountPercent > 0) {
+              <div class="sale-badge"><i class="fas fa-bolt"></i> GIẢM {{ discountPercent }}%</div>
+            }
+          </div>
+        </div>
+
+        <div class="thumb-gallery">
+          <div class="thumb-row">
+            @for (img of galleryImages; track $index) {
+              <button
+                class="thumb"
+                type="button"
+                [class.active]="img.imageUrl === selectedImage"
+                (click)="selectImage(img)"
+                (mouseenter)="selectImage(img)"
+              >
+                <img
+                  [src]="img.imageUrl"
+                  [alt]="product.name + ' - ' + (img.label || 'Ảnh')"
+                  loading="lazy"
+                />
+                @if (img.label) {
+                  <span class="thumb-label">{{ img.label }}</span>
+                }
               </button>
             }
           </div>
-        }
-        <!-- Ảnh chính -->
-        <div class="main-image" [class.zoomed]="zoomed" (click)="zoomed = !zoomed">
-          <img [src]="selectedImage || 'https://placehold.co/500x500/111820/ff6b1a?text=GymStore'"
-               [alt]="product.name" />
-          <div class="zoom-hint"><i class="fas fa-search-plus"></i></div>
-          @if (product.salePrice) {
-            <div class="sale-badge">SALE</div>
-          }
+        </div>
+
+        <!-- Cam kết an tâm dưới ảnh -->
+        <div class="security-guarantee">
+          <div class="guarantee-item">
+            <i class="fas fa-shield-check"></i>
+            <span>100% Chính hãng có tem Bộ Công An</span>
+          </div>
+          <div class="guarantee-item">
+            <i class="fas fa-box-check"></i>
+            <span>Được kiểm tra hàng trước khi thanh toán</span>
+          </div>
         </div>
       </div>
 
-      <!-- RIGHT: Purchase Panel -->
+      <!-- CỘT PHẢI: Bảng chọn mua (Hương vị, Khối lượng/Kích thước, Số lần dùng, Số lượng, Mua ngay) -->
       <div class="purchase-col">
-        <!-- Brand + Category -->
+        <!-- Thương hiệu & Danh mục -->
         <div class="product-meta">
-          <span class="meta-brand"><i class="fas fa-trademark"></i> {{ product.brandName }}</span>
+          <span class="meta-tag brand-tag">
+            <i class="fas fa-crown"></i> Thương hiệu: <strong>{{ product.brandName }}</strong>
+          </span>
           <span class="meta-sep">·</span>
-          <span class="meta-cat"><i class="fas fa-th-list"></i> {{ product.categoryName }}</span>
+          <span class="meta-tag cat-tag">
+            <i class="fas fa-dumbbell"></i> <strong>{{ product.categoryName }}</strong>
+          </span>
+          <span class="meta-sep">·</span>
+          <span class="meta-tag rating-tag">
+            <i class="fas fa-star gold"></i> 5.0 (128 đánh giá)
+          </span>
         </div>
 
         <!-- Tên sản phẩm -->
         <h1 class="product-title">{{ product.name }}</h1>
 
-        <!-- Giá -->
+        <!-- Khung giá Shopee (cập nhật theo kích thước) -->
         <div class="price-panel">
-          @if (product.salePrice) {
-            <span class="price-sale">{{ formatPrice(product.salePrice) }}</span>
-            <span class="price-orig">{{ formatPrice(product.price) }}</span>
-            <span class="discount-tag">
-              -{{ ((1 - product.salePrice / product.price) * 100) | number:'1.0-0' }}%
+          <div class="price-main-row">
+            <span class="price-sale">{{ formatPrice(currentPrice) }}</span>
+            @if (product.salePrice) {
+              <span class="price-orig">{{ formatPrice(currentOrigPrice) }}</span>
+              <span class="discount-tag">-{{ discountPercent }}%</span>
+            }
+          </div>
+          <div class="price-subtext">
+            <i class="fas fa-badge-percent"></i> Cam kết giá tốt nhất thị trường · Freeship toàn
+            quốc từ 500k
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 1. CHỌN HƯƠNG VỊ / LOẠI -->
+        @if (flavorOptions.length > 0) {
+          <div class="option-section">
+            <div class="option-header">
+              <span class="option-title">1. Chọn hương vị / Loại:</span>
+              <span class="option-active-value">{{ selectedFlavor }}</span>
+            </div>
+            <div class="option-chips">
+              @for (f of flavorOptions; track f) {
+                <button
+                  type="button"
+                  class="chip flavor-chip"
+                  [class.active]="selectedFlavor === f"
+                  (click)="selectFlavor(f)"
+                >
+                  <i class="fas fa-check-circle check-icon"></i>
+                  {{ f }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- 2. CHỌN KÍCH THƯỚC / SỐ KG -->
+        @if (weightOptions.length > 0) {
+          <div class="option-section">
+            <div class="option-header">
+              <span class="option-title">2. Chọn kích thước / Số kg:</span>
+              <span class="option-active-value">{{ selectedWeightOption?.label }}</span>
+            </div>
+            <div class="option-chips">
+              @for (w of weightOptions; track w.label) {
+                <button
+                  type="button"
+                  class="chip size-chip"
+                  [class.active]="selectedWeightOption?.label === w.label"
+                  (click)="selectWeightOption(w)"
+                >
+                  <i class="fas fa-check-circle check-icon"></i>
+                  <span class="size-name">{{ w.label }}</span>
+                  <span class="size-servings">({{ w.servingSize }} lần dùng)</span>
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (selectedWeightOption) {
+          <div class="servings-preview">
+            <i class="fas fa-utensils"></i>
+            <span
+              >Số lần dùng tương ứng:
+              <strong>{{ selectedWeightOption.servingSize }} servings</strong> (khoảng
+              {{ selectedWeightOption.servingSize / 2 | number: '1.0-0' }} -
+              {{ selectedWeightOption.servingSize }} ngày sử dụng)</span
+            >
+          </div>
+        }
+
+        <div class="divider"></div>
+
+        <!-- 4. CHỌN SỐ LƯỢNG -->
+        <div class="qty-section" [formGroup]="addToCartForm">
+          <div class="qty-header">
+            <span class="option-title">3. Số lượng:</span>
+          </div>
+          <div class="qty-action-row">
+            <div class="qty-ctrl">
+              <button
+                class="qty-btn"
+                type="button"
+                (click)="decQty()"
+                [disabled]="addToCartForm.get('quantity')!.value <= 1"
+              >
+                <i class="fas fa-minus"></i>
+              </button>
+              <input type="number" formControlName="quantity" min="1" max="99" class="qty-input" />
+              <button class="qty-btn" type="button" (click)="incQty()">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <span class="stock-status">
+              <i class="fas fa-check-circle text-success"></i> Còn hàng sẵn tại kho
             </span>
-          } @else {
-            <span class="price-sale">{{ formatPrice(product.price) }}</span>
-          }
-        </div>
-
-        <div class="divider"></div>
-
-        <!-- Hương vị (chip select) -->
-        @if (product.flavor) {
-          <div class="option-row">
-            <span class="option-label">Hương vị</span>
-            <div class="option-chips">
-              <button class="chip active">{{ product.flavor }}</button>
-            </div>
-          </div>
-        }
-
-        <!-- Khối lượng (chip select) -->
-        @if (product.weightGrams) {
-          <div class="option-row">
-            <span class="option-label">Khối lượng</span>
-            <div class="option-chips">
-              <button class="chip active">{{ product.weightGrams >= 1000 ? (product.weightGrams / 1000 | number:'1.0-1') + ' kg' : product.weightGrams + ' g' }}</button>
-            </div>
-          </div>
-        }
-
-        <!-- Số lần dùng -->
-        @if (product.servingSize) {
-          <div class="option-row">
-            <span class="option-label">Số lần dùng</span>
-            <div class="option-chips">
-              <button class="chip active">{{ product.servingSize }} servings</button>
-            </div>
-          </div>
-        }
-
-        <div class="divider"></div>
-
-        <!-- Số lượng -->
-        <div class="qty-row" [formGroup]="addToCartForm">
-          <span class="option-label">Số lượng</span>
-          <div class="qty-ctrl">
-            <button class="qty-btn" type="button"
-                    (click)="decQty()"
-                    [disabled]="addToCartForm.get('quantity')!.value <= 1">
-              <i class="fas fa-minus"></i>
-            </button>
-            <input type="number" formControlName="quantity" min="1" max="99" class="qty-input" />
-            <button class="qty-btn" type="button" (click)="incQty()">
-              <i class="fas fa-plus"></i>
-            </button>
           </div>
         </div>
 
-        <!-- CTA Buttons -->
+        <!-- NÚT MUA HÀNG & THÊM VÀO GIỎ -->
         @if (product.status === 'ACTIVE') {
           <div class="cta-row">
-            <button class="btn btn-cart" (click)="addToCart()" [disabled]="addToCartForm.invalid">
-              <i class="fas fa-cart-plus"></i> Thêm vào giỏ
+            <button
+              class="btn btn-cart"
+              type="button"
+              (click)="addToCart()"
+              [disabled]="addToCartForm.invalid"
+            >
+              <i class="fas fa-cart-plus"></i> Thêm vào giỏ hàng
             </button>
-            <button class="btn btn-buy" (click)="addToCart()" [disabled]="addToCartForm.invalid">
-              <i class="fas fa-bolt"></i> Mua ngay
+            <button
+              class="btn btn-buy"
+              type="button"
+              (click)="buyNow()"
+              [disabled]="addToCartForm.invalid"
+            >
+              <i class="fas fa-bolt"></i> Mua ngay với giá ưu đãi
             </button>
           </div>
-          @if (addedMsg) {
-            <div class="success-msg">
-              <i class="fas fa-check-circle"></i> Đã thêm vào giỏ hàng!
-            </div>
-          }
         } @else {
           <div class="out-of-stock">
-            <i class="fas fa-times-circle"></i> Hết hàng — tạm thời không có sẵn
+            <i class="fas fa-times-circle"></i> Sản phẩm hiện đang tạm hết hàng tại kho
           </div>
         }
 
-        <!-- Trust badges -->
-        <div class="trust-row">
-          <div class="trust-item"><i class="fas fa-certificate"></i><span>Chính hãng 100%</span></div>
-          <div class="trust-item"><i class="fas fa-shipping-fast"></i><span>Giao nhanh 2h</span></div>
-          <div class="trust-item"><i class="fas fa-undo"></i><span>Đổi trả 30 ngày</span></div>
-          <div class="trust-item"><i class="fas fa-shield-alt"></i><span>Bảo hành chính hãng</span></div>
+        <!-- 4 Dòng cam kết quyền lợi khách hàng -->
+        <div class="trust-grid">
+          <div class="trust-box">
+            <i class="fas fa-medal"></i>
+            <div>
+              <strong>100% Chính hãng</strong>
+              <small>Đền gấp đôi nếu phát hiện giả</small>
+            </div>
+          </div>
+          <div class="trust-box">
+            <i class="fas fa-shipping-fast"></i>
+            <div>
+              <strong>Giao hàng siêu tốc</strong>
+              <small>Hỏa tốc 2 giờ nội thành</small>
+            </div>
+          </div>
+          <div class="trust-box">
+            <i class="fas fa-sync-alt"></i>
+            <div>
+              <strong>Đổi trả 30 ngày</strong>
+              <small>Miễn phí đổi hàng lỗi sản xuất</small>
+            </div>
+          </div>
+          <div class="trust-box">
+            <i class="fas fa-user-headset"></i>
+            <div>
+              <strong>Tư vấn thể hình</strong>
+              <small>Chuyên viên dinh dưỡng 24/7</small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== BOTTOM: Description + Specs ===== -->
+    <!-- ===== PHÍA DƯỚI: Mô tả đầy đủ thông tin sản phẩm và Xuất xứ ===== -->
     <div class="product-bottom">
-
-      <!-- Thông số sản phẩm -->
+      <!-- Bảng thông số chi tiết & Xuất xứ -->
       <div class="info-card">
         <div class="info-card-header">
-          <i class="fas fa-list-alt"></i> Thông số sản phẩm
+          <i class="fas fa-clipboard-check"></i>
+          <span>CHI TIẾT THÔNG SỐ SẢN PHẨM & XUẤT XỨ</span>
         </div>
         <div class="spec-table">
           <div class="spec-row">
-            <span class="spec-key">Thương hiệu</span>
-            <span class="spec-val">{{ product.brandName }}</span>
+            <span class="spec-key"><i class="fas fa-globe-americas"></i> Xuất xứ thương hiệu</span>
+            <span class="spec-val highlight-val"
+              >Mỹ (United States) / Nhập khẩu chính ngạch chính hãng 100%</span
+            >
           </div>
           <div class="spec-row">
-            <span class="spec-key">Danh mục</span>
+            <span class="spec-key"><i class="fas fa-certificate"></i> Chứng nhận chất lượng</span>
+            <span class="spec-val"
+              >Tiêu chuẩn FDA Hoa Kỳ, đạt chứng nhận cGMP, NSF Certified for Sport</span
+            >
+          </div>
+          <div class="spec-row">
+            <span class="spec-key"><i class="fas fa-trademark"></i> Hãng sản xuất</span>
+            <span class="spec-val"
+              ><strong>{{ product.brandName }}</strong></span
+            >
+          </div>
+          <div class="spec-row">
+            <span class="spec-key"><i class="fas fa-layer-group"></i> Phân loại sản phẩm</span>
             <span class="spec-val">{{ product.categoryName }}</span>
           </div>
-          @if (product.flavor) {
-            <div class="spec-row">
-              <span class="spec-key">Hương vị</span>
-              <span class="spec-val">{{ product.flavor }}</span>
-            </div>
-          }
-          @if (product.weightGrams) {
-            <div class="spec-row">
-              <span class="spec-key">Khối lượng tịnh</span>
-              <span class="spec-val">
-                {{ product.weightGrams >= 1000 ? (product.weightGrams / 1000 | number:'1.0-2') + ' kg' : product.weightGrams + ' g' }}
-              </span>
-            </div>
-          }
-          @if (product.servingSize) {
-            <div class="spec-row">
-              <span class="spec-key">Số lần dùng (servings)</span>
-              <span class="spec-val">{{ product.servingSize }}</span>
-            </div>
-          }
           <div class="spec-row">
-            <span class="spec-key">Xuất xứ</span>
-            <span class="spec-val">Chính hãng nhập khẩu</span>
+            <span class="spec-key"><i class="fas fa-ice-cream"></i> Hương vị hiện chọn</span>
+            <span class="spec-val"
+              ><strong>{{ selectedFlavor }}</strong></span
+            >
           </div>
           <div class="spec-row">
-            <span class="spec-key">Trạng thái</span>
+            <span class="spec-key"><i class="fas fa-weight-hanging"></i> Khối lượng tịnh</span>
+            <span class="spec-val"
+              ><strong>{{ selectedWeightOption?.label }}</strong> (khoảng
+              {{ selectedWeightOption?.grams }}g)</span
+            >
+          </div>
+          <div class="spec-row">
+            <span class="spec-key"><i class="fas fa-clock"></i> Số lần dùng</span>
+            <span class="spec-val"
+              ><strong>{{ selectedWeightOption?.servingSize }} lần dùng</strong> (servings)</span
+            >
+          </div>
+          <div class="spec-row">
+            <span class="spec-key"><i class="fas fa-hourglass-half"></i> Hạn sử dụng (EXP)</span>
+            <span class="spec-val">24 tháng kể từ ngày sản xuất (Hàng date xa mới nhất)</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-key"><i class="fas fa-warehouse"></i> Tình trạng kho hàng</span>
             <span class="spec-val">
               @if (product.status === 'ACTIVE') {
-                <span class="status-badge in-stock"><i class="fas fa-check-circle"></i> Còn hàng</span>
+                <span class="status-badge in-stock"
+                  ><i class="fas fa-check-circle"></i> Sẵn sàng giao ngay</span
+                >
               } @else {
                 <span class="status-badge out"><i class="fas fa-times-circle"></i> Hết hàng</span>
               }
@@ -205,19 +326,50 @@
         </div>
       </div>
 
-      <!-- Mô tả sản phẩm -->
-      @if (product.description) {
-        <div class="info-card">
-          <div class="info-card-header">
-            <i class="fas fa-align-left"></i> Mô tả sản phẩm
-          </div>
-          <div class="desc-body">
-            <p>{{ product.description }}</p>
+      <!-- Mô tả chi tiết & Hướng dẫn sử dụng -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <i class="fas fa-align-left"></i>
+          <span>MÔ TẢ CHI TIẾT SẢN PHẨM & HƯỚNG DẪN SỬ DỤNG</span>
+        </div>
+        <div class="desc-body">
+          @if (product.description) {
+            <div class="desc-content">
+              {{ product.description }}
+            </div>
+          }
+
+          <div class="usage-guide">
+            <h4 class="guide-title">
+              <i class="fas fa-blender"></i> HƯỚNG DẪN SỬ DỤNG ĐẠT HIỆU QUẢ CAO NHẤT:
+            </h4>
+            <ul class="guide-list">
+              <li>
+                <strong>Cách pha:</strong> Cho 1 muỗng (scoop) vào bình lắc (shaker) cùng 250 -
+                300ml nước lọc nguội hoặc sữa tươi không đường. Lắc đều trong 15 - 20 giây cho bột
+                tan hoàn toàn.
+              </li>
+              <li>
+                <strong>Thời điểm uống tốt nhất:</strong>
+                <ul>
+                  <li>
+                    <strong>Sáng sớm ngay khi thức dậy:</strong> Bổ sung protein nhanh sau giấc ngủ
+                    dài để chống dị hóa cơ.
+                  </li>
+                  <li>
+                    <strong>Ngay sau khi tập gym 15 - 30 phút:</strong> Đây là "thời điểm vàng" giúp
+                    cơ bắp hấp thu tối đa dưỡng chất để phục hồi và phát triển.
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <strong>Lưu ý bảo quản:</strong> Để nơi khô ráo, thoáng mát, tránh ánh nắng trực
+                tiếp. Đậy kín nắp sau mỗi lần sử dụng.
+              </li>
+            </ul>
           </div>
         </div>
-      }
-
+      </div>
     </div>
-
   </div>
 }

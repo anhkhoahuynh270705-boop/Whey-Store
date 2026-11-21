@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { StaffInventoryService } from '../inventory.service';
-import { InventoryItem } from '../../../core/models/inventory.model';
+import { InventoryItem } from '../model/inventory.model';
+import { StaffInventoryService } from '../service/inventory.service';
 
 @Component({
   selector: 'app-staff-inventory-list',
@@ -18,12 +18,14 @@ export class StaffInventoryListComponent implements OnInit {
   private inventoryService = inject(StaffInventoryService);
   protected cdr = inject(ChangeDetectorRef);
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
   load(): void {
     this.loading = true;
     this.inventoryService.getInventory().subscribe({
-      next: d => {
+      next: (d) => {
         this.items = d;
         this.loading = false;
         this.cdr.markForCheck();
@@ -31,14 +33,16 @@ export class StaffInventoryListComponent implements OnInit {
       error: () => {
         this.loading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
   get filtered(): InventoryItem[] {
     const q = this.search.toLowerCase();
-    return !q ? this.items : this.items.filter(i => i.sku.toLowerCase().includes(q));
+    return !q ? this.items : this.items.filter((i) => i.sku.toLowerCase().includes(q));
   }
 
-  get lowStock(): number { return this.items.filter(i => i.availableQty < 10).length; }
+  get lowStock(): number {
+    return this.items.filter((i) => i.availableQty < 10).length;
+  }
 }

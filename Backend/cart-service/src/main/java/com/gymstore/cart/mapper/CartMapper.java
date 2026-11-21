@@ -42,10 +42,6 @@ public interface CartMapper {
     @Mapping(target = "quantity", expression = "java((existing != null ? existing.quantity() : 0) + incoming.quantity())")
     CartItem mergeItem(CartItem existing, CartItem incoming);
 
-    /**
-     * Build CartDto response from calculated attributes.
-     */
-    @Mapping(target = "cartOwner", source = "cartOwner")
-    @Mapping(target = "totalQuantity", source = "totalQuantity")
+    /** Build CartDto response from attributes calculated by CartService. */
     CartDto toCartDto(String cartOwner, List<CartItem> items, BigDecimal totalAmount, int totalQuantity);
 }

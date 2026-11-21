@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { StaffOrdersService } from '../orders.service';
-import { Order } from '../../../core/models/order.model';
+import { Order } from '../model/order.model';
+import { StaffOrdersService } from '../service/orders.service';
 
 @Component({
   selector: 'app-staff-order-detail',

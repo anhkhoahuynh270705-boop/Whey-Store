@@ -23,12 +23,11 @@ public class PurchaseProcessServiceImpl implements IPurchaseProcessService {
 
     private static final Logger log = LoggerFactory.getLogger(PurchaseProcessServiceImpl.class);
     private static final String PROCESS_DEF_KEY = "purchase-product-process";
-
     RuntimeService runtimeService;
 
     @Override
     public CheckoutResponse start(Map<String, Object> variables) {
-        log.info("[PurchaseProcess] Khởi động process cho userId={}", variables.get("userId"));
+        log.info("Khởi động process cho userId={}", variables.get("userId"));
         ProcessInstance instance = runtimeService.startProcessInstanceByKey(
                 PROCESS_DEF_KEY, (String) variables.get("cartId"), variables);
         log.info("[PurchaseProcess] processInstanceId={}", instance.getProcessInstanceId());

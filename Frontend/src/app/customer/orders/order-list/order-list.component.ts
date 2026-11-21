@@ -1,8 +1,8 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { OrdersService } from '../orders.service';
-import { Order, PageResponse } from '../../../core/models/order.model';
+import { Order, PageResponse } from '../model/order.model';
+import { OrdersService } from '../service/orders.service';
 
 @Component({
   selector: 'app-order-list',

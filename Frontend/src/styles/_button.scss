@@ -1,0 +1,132 @@
+/*
+   BUTTON SYSTEM
+*/
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 24px;
+  border-radius: var(--r-sm);
+  border: none;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-bounce),
+    box-shadow var(--t-fast),
+    opacity var(--t-fast),
+    border-color var(--t-fast);
+  white-space: nowrap;
+  user-select: none;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+
+  /* Ripple pseudo */
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transition: opacity var(--t-fast);
+  }
+  &:active::after {
+    opacity: 1;
+  }
+
+  /* Primary */
+  background: var(--clr-primary);
+  color: #fff;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 26, 0.4);
+  }
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  /* Variants */
+  &.btn-outline {
+    background: transparent;
+    color: var(--clr-primary);
+    border: 1.5px solid var(--clr-primary);
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(255, 107, 26, 0.35);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-ghost {
+    background: var(--clr-surface-2);
+    color: var(--clr-text-soft);
+    border: 1px solid var(--clr-border);
+    &:hover:not(:disabled) {
+      color: var(--clr-text);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-danger {
+    background: var(--clr-danger);
+    color: #fff;
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+  }
+
+  &.btn-success {
+    background: var(--clr-success);
+    color: #fff;
+    &:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+  }
+
+  /* Sizes */
+  &.btn-xs {
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: var(--r-xs);
+  }
+  &.btn-sm {
+    padding: 7px 16px;
+    font-size: 13px;
+  }
+  &.btn-lg {
+    padding: 15px 36px;
+    font-size: 16px;
+    border-radius: var(--r-md);
+  }
+  &.btn-xl {
+    padding: 18px 48px;
+    font-size: 17px;
+    border-radius: var(--r-md);
+  }
+  &.btn-block {
+    width: 100%;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+
+  .fa,
+  .fas,
+  .far,
+  .fab,
+  .fa-solid,
+  .fa-regular,
+  .fa-brands {
+    font-size: 13px;
+  }
+}

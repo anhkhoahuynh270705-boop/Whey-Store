@@ -10,7 +10,7 @@ export const routes: Routes = [
   {
     path: 'home',
     loadComponent: () =>
-      import('./customer/home/home.component').then((m) => m.HomeComponent),
+      import('./customer/home-modal/home/home.component').then((m) => m.HomeComponent),
   },
   {
     path: 'products',
@@ -29,13 +29,23 @@ export const routes: Routes = [
   {
     path: 'cart',
     loadComponent: () =>
-      import('./customer/cart/cart.component').then((m) => m.CartComponent),
+      import('./customer/cart/cart-list/cart.component').then((m) => m.CartComponent),
+  },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./customer/auth/auth.component').then((m) => m.AuthComponent),
+  },
+  {
+    path: 'register',
+    loadComponent: () =>
+      import('./customer/auth/auth.component').then((m) => m.AuthComponent),
   },
   {
     path: 'checkout',
     canActivate: [authGuard],
     loadComponent: () =>
-      import('./customer/checkout/checkout.component').then(
+      import('./customer/checkout/checkout-modal/checkout.component').then(
         (m) => m.CheckoutComponent,
       ),
   },

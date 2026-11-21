@@ -19,6 +19,7 @@ camunda:
       first-name: Admin
     history-level: audit
     auto-deployment-enabled: true
+    deployment-resource-pattern: classpath*:bpmn/*.bpmn
     webapp:
       application-path: /camunda
     generic-properties:

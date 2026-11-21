@@ -12,6 +12,6 @@ bootstrapApplication(StaffLayoutComponent, {
   providers: [
     provideRouter(staffRoutes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]), withFetch()),
-    provideAppInitializer(() => inject(AuthService).init()),
+    provideAppInitializer(() => inject(AuthService).init('login-required')),
   ],
-}).catch(err => console.error(err));
+}).catch((err) => console.error(err));

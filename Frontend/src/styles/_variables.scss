@@ -1,0 +1,59 @@
+:root {
+  /* ---- Core Palette ---- */
+  --clr-bg: #080c10;
+  --clr-surface: #111820;
+  --clr-surface-2: #182030;
+  --clr-surface-3: #1e2a3a;
+  --clr-border: #1e2d40;
+  --clr-border-soft: #253548;
+
+  /* ---- Brand Orange ---- */
+  --clr-primary: #ff6b1a;
+  --clr-primary-dk: #d94f00;
+  --clr-primary-lt: #ff8c44;
+  --clr-primary-glow: rgba(255, 107, 26, 0.25);
+
+  /* ---- Text ---- */
+  --clr-text: #eef2f8;
+  --clr-text-muted: #6b7f96;
+  --clr-text-soft: #a8bdd4;
+
+  /* ---- Semantic ---- */
+  --clr-success: #10b981;
+  --clr-warning: #f59e0b;
+  --clr-danger: #ef4444;
+  --clr-info: #38bdf8;
+
+  /* ---- Spacing ---- */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 40px;
+  --sp-2xl: 72px;
+
+  /* ---- Radius ---- */
+  --r-xs: 4px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-pill: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 24px rgba(255, 107, 26, 0.18);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.6);
+
+  /* ---- Transitions ---- */
+  --t-fast: 160ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-base: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-slow: 440ms cubic-bezier(0.4, 0, 0.2, 1);
+  --t-bounce: 360ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Layout ---- */
+  --container-max: 1280px;
+  --navbar-h: 68px;
+}

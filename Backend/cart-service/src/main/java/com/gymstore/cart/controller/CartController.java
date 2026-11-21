@@ -75,7 +75,7 @@ public class CartController {
         cartService.clear(id.cartKey());
     }
 
-    /** Gộp giỏ guest (theo header X-Cart-Id) vào giỏ user đang đăng nhập. Yêu cầu JWT. */
+    /** Gộp giỏ guest vào giỏ user đang đăng nhập. Yêu cầu JWT. */
     @PostMapping("/merge")
     public CartDto mergeCart(@RequestHeader(value = "X-Cart-Id", required = false) String guestId) {
         String userId = JwtUser.userId();

@@ -18,11 +18,11 @@ public class RateLimiterConfig {
                         String name = principal.getName();
                         return (name != null && !name.isBlank()) ? name : resolveIp(exchange);
                     })
-                    .switchIfEmpty(Mono.just(resolveIp(exchange)));
+                    .switchIfEmpty(Mono.fromCallable(() -> resolveIp(exchange)));
         };
     }
 
-    private String resolveIp(ServerWebExchange exchange) {
+    private String resolveIp(ServerWebExchange exchange) {  
         var remote = exchange.getRequest().getRemoteAddress();
         String xff = exchange.getRequest().getHeaders().getFirst("X-Forwarded-For");
         if (xff != null && !xff.isBlank()) {

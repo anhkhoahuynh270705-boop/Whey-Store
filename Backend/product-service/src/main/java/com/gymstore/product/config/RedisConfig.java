@@ -21,11 +21,6 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import java.time.Duration;
 import java.util.Map;
 
-/**
- * Cấu hình Redis cho product-service:
- * - CacheManager cho @Cacheable (danh sách sản phẩm/danh mục/thương hiệu), TTL mỗi cache.
- * - RedisTemplate<String,Object> JSON serializer cho cache-aside thủ công (chi tiết sản phẩm).
- */
 @Configuration
 @EnableCaching
 public class RedisConfig {

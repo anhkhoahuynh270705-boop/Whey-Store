@@ -1,8 +1,10 @@
 package com.gymstore.workflow.delegate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gymstore.common.dto.order.request.CheckoutItem;
 import com.gymstore.common.event.OrderCancelledEvent;
 import com.gymstore.common.event.OrderItemEvent;
-import com.gymstore.common.dto.order.request.CheckoutItem;
+import com.gymstore.workflow.mapper.ProcessVariableMapper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
@@ -22,22 +24,27 @@ public class PublishOrderCancelledDelegate implements JavaDelegate {
     private static final String TOPIC = "order.cancelled";
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ProcessVariableMapper processVariableMapper;
+    private final ObjectMapper objectMapper;
 
-    public PublishOrderCancelledDelegate(KafkaTemplate<String, Object> kafkaTemplate) {
+    public PublishOrderCancelledDelegate(KafkaTemplate<String, Object> kafkaTemplate,
+                                         ProcessVariableMapper processVariableMapper,
+                                         ObjectMapper objectMapper) {
         this.kafkaTemplate = kafkaTemplate;
+        this.processVariableMapper = processVariableMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void execute(DelegateExecution execution) {
-        Long orderId = (Long) execution.getVariable("orderId");
-        String orderNumber = (String) execution.getVariable("orderNumber");
-        String userId = (String) execution.getVariable("userId");
-        String userEmail = (String) execution.getVariable("userEmail");
-        String userFullName = (String) execution.getVariable("userFullName");
+        Long orderId        = (Long) execution.getVariable("orderId");
+        String orderNumber  = (String) execution.getVariable("orderNumber");
+        String userId       = (String) execution.getVariable("userId");
+        String userEmail    = (String) execution.getVariable("email");
+        String userFullName = (String) execution.getVariable("fullName");
         BigDecimal totalAmount = (BigDecimal) execution.getVariable("totalAmount");
         String cancelReason = (String) execution.getVariable("cancelReason");
-        List<CheckoutItem> checkoutItems = (List<CheckoutItem>) execution.getVariable("items");
+        List<CheckoutItem> checkoutItems = processVariableMapper.resolveItems(execution, objectMapper);
 
         List<OrderItemEvent> itemEvents = checkoutItems == null ? List.of() :
                 checkoutItems.stream()

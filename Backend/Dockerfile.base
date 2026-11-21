@@ -1,9 +1,5 @@
-# Base Dockerfile template for all Spring Boot services
-# Multi-stage build: Build stage + Runtime stage
 
-# ============================================
 # Stage 1: BUILD
-# ============================================
 FROM maven:3.9-eclipse-temurin-21-alpine AS build
 
 WORKDIR /app
@@ -25,9 +21,7 @@ COPY ${SERVICE_NAME}/src ./${SERVICE_NAME}/src
 # Build the service
 RUN mvn clean package -pl ${SERVICE_NAME} -am -DskipTests
 
-# ============================================
 # Stage 2: RUNTIME
-# ============================================
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app

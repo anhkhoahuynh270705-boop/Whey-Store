@@ -1,8 +1,10 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminProductsService } from '../products.service';
-import { Product } from '../../../core/models/product.model';
+import { Product } from '../model/product.model';
+import { AdminProductsService } from '../service/products.service';
+import { ConfirmDialogService } from '../../../shared/confirm/service/confirm-dialog.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-admin-product-detail',
@@ -14,13 +16,14 @@ import { Product } from '../../../core/models/product.model';
 export class AdminProductDetailComponent implements OnInit {
   product: Product | null = null;
   loading = true;
-  errorMsg = '';
   selectedImage = '';
 
   private productsService = inject(AdminProductsService);
-  private route  = inject(ActivatedRoute);
+  private toast = inject(ToastService);
+  private confirm = inject(ConfirmDialogService);
+  private route = inject(ActivatedRoute);
   private router = inject(Router);
-  protected cdr  = inject(ChangeDetectorRef);
+  protected cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -28,15 +31,15 @@ export class AdminProductDetailComponent implements OnInit {
       next: (p: Product) => {
         this.product = p;
         this.selectedImage =
-          p.images?.find(i => i.isPrimary)?.imageUrl ?? p.images?.[0]?.imageUrl ?? '';
+          p.images?.find((i) => i.isPrimary)?.imageUrl ?? p.images?.[0]?.imageUrl ?? '';
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: () => {
-        this.errorMsg = 'Không tìm thấy sản phẩm';
-        this.loading  = false;
+        this.toast.error('Không tìm thấy thông tin sản phẩm');
+        this.loading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 
@@ -45,15 +48,28 @@ export class AdminProductDetailComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  goEdit(): void   { this.router.navigate(['/products', this.product!.id, 'edit']); }
-  goList(): void   { this.router.navigate(['/products']); }
+  goEdit(): void {
+    this.router.navigate(['/products', this.product!.id, 'edit']);
+  }
+  goList(): void {
+    this.router.navigate(['/products']);
+  }
 
-  deleteProduct(): void {
+  async deleteProduct(): Promise<void> {
     if (!this.product) return;
-    if (!confirm('Xác nhận xoá sản phẩm? Hành động này không thể hoàn tác.')) return;
+    const ok = await this.confirm.open({
+      title: 'Xoá sản phẩm?',
+      message: `"${this.product.name}" sẽ bị xoá vĩnh viễn. Hành động này không thể hoàn tác.`,
+      confirmLabel: 'Xoá',
+      cancelLabel: 'Giữ lại',
+      variant: 'danger',
+    });
+    if (!ok) return;
     this.productsService.deleteProduct(this.product.id).subscribe({
       next: () => this.router.navigate(['/products']),
-      error: () => { alert('Xoá thất bại'); }
+      error: () => {
+        alert('Xoá thất bại');
+      },
     });
   }
 
@@ -65,4 +81,3 @@ export class AdminProductDetailComponent implements OnInit {
     return new Date(d).toLocaleString('vi-VN');
   }
 }
-

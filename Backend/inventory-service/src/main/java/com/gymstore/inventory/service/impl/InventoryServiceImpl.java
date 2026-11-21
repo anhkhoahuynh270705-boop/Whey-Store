@@ -149,7 +149,7 @@ public class InventoryServiceImpl implements IInventoryService {
         StockReservation reservation = mapper.toReservation(orderId, item);
         reservationRepository.save(reservation);
 
-        movementRepository.save(new StockMovement(item.productId(), orderId, item.quantity(), StockMovementType.RESERVE));
+        movementRepository.save(mapper.toStockMovement(item.productId(), orderId, item.quantity(), StockMovementType.RESERVE));
         return true;
     }
 
@@ -165,7 +165,7 @@ public class InventoryServiceImpl implements IInventoryService {
                     itemRepository.save(inv);
                     r.setStatus(ReservationStatus.RELEASED);
                     reservationRepository.save(r);
-                    movementRepository.save(new StockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.RELEASE));
+                    movementRepository.save(mapper.toStockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.RELEASE));
                 });
                 return null;
             });
@@ -189,7 +189,7 @@ public class InventoryServiceImpl implements IInventoryService {
                     itemRepository.save(inv);
                     r.setStatus(ReservationStatus.COMMITTED);
                     reservationRepository.save(r);
-                    movementRepository.save(new StockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.COMMIT));
+                    movementRepository.save(mapper.toStockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.COMMIT));
                 });
                 return null;
             });
@@ -215,7 +215,7 @@ public class InventoryServiceImpl implements IInventoryService {
                     itemRepository.save(inv);
                     r.setStatus(ReservationStatus.RELEASED);
                     reservationRepository.save(r);
-                    movementRepository.save(new StockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.RELEASE));
+                    movementRepository.save(mapper.toStockMovement(r.getProductId(), orderId, r.getQuantity(), StockMovementType.RELEASE));
                 });
                 return null;
             });

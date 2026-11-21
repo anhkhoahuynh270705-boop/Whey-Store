@@ -12,7 +12,7 @@
     <div class="table-toolbar">
       <span class="toolbar-title">Danh sách tồn kho</span>
       <div class="toolbar-filter">
-        <input type="text" placeholder="Tìm SKU..." [(ngModel)]="search" style="max-width:200px" />
+        <input type="text" placeholder="Tìm SKU..." [(ngModel)]="search" style="max-width: 200px" />
       </div>
     </div>
     @if (loading) {
@@ -20,21 +20,30 @@
     } @else {
       <div class="table-scroll">
         <table class="data-table">
-          <thead><tr>
-            <th>Product ID</th>
-            <th>SKU</th>
-            <th class="td-center">Có thể bán</th>
-            <th class="td-center">Đang giữ</th>
-            <th class="td-center">Tình trạng</th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th>Product ID</th>
+              <th>SKU</th>
+              <th class="td-center">Có thể bán</th>
+              <th class="td-center">Đang giữ</th>
+              <th class="td-center">Tình trạng</th>
+            </tr>
+          </thead>
           <tbody>
             @for (item of filtered; track item.productId) {
               <tr>
                 <td class="td-mono">{{ item.productId }}</td>
                 <td class="td-primary">{{ item.sku }}</td>
-                <td class="td-center" [style.color]="item.availableQty < 10 ? 'var(--clr-warning)' : 'var(--clr-success)'"
-                    style="font-weight:700">{{ item.availableQty }}</td>
-                <td class="td-center" style="color:var(--clr-warning)">{{ item.reservedQty }}</td>
+                <td
+                  class="td-center"
+                  [style.color]="
+                    item.availableQty < 10 ? 'var(--clr-warning)' : 'var(--clr-success)'
+                  "
+                  style="font-weight: 700"
+                >
+                  {{ item.availableQty }}
+                </td>
+                <td class="td-center" style="color: var(--clr-warning)">{{ item.reservedQty }}</td>
                 <td class="td-center">
                   @if (item.availableQty === 0) {
                     <span class="badge badge-error">Hết hàng</span>

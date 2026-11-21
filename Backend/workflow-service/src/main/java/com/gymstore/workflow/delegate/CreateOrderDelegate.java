@@ -1,9 +1,11 @@
 package com.gymstore.workflow.delegate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gymstore.common.dto.order.request.CheckoutItem;
 import com.gymstore.common.dto.order.request.CreateOrderRequest;
 import com.gymstore.common.dto.order.response.OrderDto;
 import com.gymstore.workflow.client.OrderClient;
+import com.gymstore.workflow.mapper.ProcessVariableMapper;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.slf4j.Logger;
@@ -23,20 +25,25 @@ public class CreateOrderDelegate implements JavaDelegate {
     private static final Logger log = LoggerFactory.getLogger(CreateOrderDelegate.class);
 
     private final OrderClient orderClient;
+    private final ProcessVariableMapper processVariableMapper;
+    private final ObjectMapper objectMapper;
 
-    public CreateOrderDelegate(OrderClient orderClient) {
+    public CreateOrderDelegate(OrderClient orderClient,
+                               ProcessVariableMapper processVariableMapper,
+                               ObjectMapper objectMapper) {
         this.orderClient = orderClient;
+        this.processVariableMapper = processVariableMapper;
+        this.objectMapper = objectMapper;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void execute(DelegateExecution execution) {
-        String userId = (String) execution.getVariable("userId");
-        String userEmail = (String) execution.getVariable("userEmail");
-        String userFullName = (String) execution.getVariable("userFullName");
+        String userId        = (String) execution.getVariable("userId");
+        String userEmail     = (String) execution.getVariable("email");
+        String userFullName  = (String) execution.getVariable("fullName");
         String shippingAddress = (String) execution.getVariable("shippingAddress");
         String paymentMethod = (String) execution.getVariable("paymentMethod");
-        List<CheckoutItem> items = (List<CheckoutItem>) execution.getVariable("items");
+        List<CheckoutItem> items = processVariableMapper.resolveItems(execution, objectMapper);
         BigDecimal totalAmount = (BigDecimal) execution.getVariable("totalAmount");
 
         log.info("[CreateOrder] userId={} paymentMethod={}", userId, paymentMethod);

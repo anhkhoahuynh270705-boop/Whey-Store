@@ -27,4 +27,15 @@ public interface PaymentMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Payment toEntity(ProcessPaymentRequest req);
+
+    /**
+     * Khởi tạo Payment entity với kết quả xử lý giao dịch.
+     */
+    default Payment toEntity(ProcessPaymentRequest req, boolean success, String transactionId, String providerResponse) {
+        Payment payment = toEntity(req);
+        payment.setStatus(success ? com.gymstore.payment.enums.PaymentStatus.SUCCESS : com.gymstore.payment.enums.PaymentStatus.FAILED);
+        payment.setTransactionId(transactionId);
+        payment.setProviderResponse(providerResponse);
+        return payment;
+    }
 }

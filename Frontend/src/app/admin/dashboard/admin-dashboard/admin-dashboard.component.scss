@@ -1,0 +1,254 @@
+﻿.admin-page {
+  padding: 24px 28px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #e2e6f3;
+    margin: 0;
+  }
+
+  .text-muted {
+    color: #6b7280;
+  }
+  .small {
+    font-size: 12px;
+  }
+}
+
+// ── Stats row
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #13161d;
+  border: 1px solid #22263a;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 150ms;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 5px;
+  background: #818cf8;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #e2e6f3;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+// ── Table card & shared table styles
+.table-card {
+  background: #13161d;
+  border: 1px solid #22263a;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid #22263a;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #e2e6f3;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: 11px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #6b7280;
+    border-bottom: 1px solid #22263a;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 16px;
+    font-size: 13px;
+    color: #9ca3af;
+    border-bottom: 1px solid rgba(34, 38, 58, 0.6);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition:
+      background 120ms,
+      transform 120ms;
+
+    &:last-child td {
+      border-bottom: none;
+    }
+    &:hover {
+      background: #1a1d26;
+    }
+  }
+}
+
+// cell modifiers
+.td-primary {
+  color: #e2e6f3;
+  font-weight: 600;
+}
+.td-mono {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 12px;
+  color: #6b7280;
+}
+.td-price {
+  color: #818cf8;
+  font-weight: 700;
+  text-align: right;
+}
+.td-right {
+  text-align: right;
+}
+.td-center {
+  text-align: center;
+}
+.td-muted {
+  color: #6b7280;
+}
+
+// status badges
+.status-pending {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+.status-completed {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+.status-cancelled {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+.status-processing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+}
+
+.loading-state {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+// btn
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #22263a;
+  background: #1a1d26;
+  color: #9ca3af;
+  transition: transform 150ms;
+  text-decoration: none;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &.btn-sm {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  &.btn-outline {
+    border-color: #6366f1;
+    color: #818cf8;
+    background: transparent;
+  }
+}

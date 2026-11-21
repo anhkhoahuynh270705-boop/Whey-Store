@@ -1,7 +1,3 @@
-
-# DEV ENVIRONMENT - Complete Configuration for Local Development
-# Sử dụng: SPRING_PROFILES_ACTIVE=dev
-
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}

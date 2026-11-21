@@ -1,0 +1,123 @@
+.auth-redirect {
+  min-height: calc(100vh - var(--navbar-h, 64px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  background: radial-gradient(circle at 50% 20%, rgba(255, 107, 26, 0.08) 0%, transparent 60%);
+}
+
+.redirect-card {
+  background: var(--clr-surface, #1a1c23);
+  border: 1px solid var(--clr-border, #252830);
+  border-radius: var(--r-xl, 16px);
+  padding: 48px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--clr-text, #fff);
+  letter-spacing: 0.02em;
+
+  i {
+    color: var(--clr-primary, #ff6b1a);
+    font-size: 24px;
+  }
+
+  .accent {
+    color: var(--clr-primary, #ff6b1a);
+  }
+}
+
+.spinner {
+  font-size: 36px;
+  color: var(--clr-primary, #ff6b1a);
+  animation: none;
+
+  i {
+    display: block;
+  }
+}
+
+.redirect-text {
+  font-size: 14px;
+  color: var(--clr-text-muted, #94a3b8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.redirect-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 13px 20px;
+  background: var(--clr-primary, #ff6b1a);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md, 8px);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(255, 107, 26, 0.3);
+  transition: transform 150ms, box-shadow 150ms;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(255, 107, 26, 0.5);
+  }
+}
+
+.btn-secondary {
+  width: 100%;
+  padding: 11px 18px;
+  background: var(--clr-surface-2, #20232c);
+  color: var(--clr-text-soft, #cbd5e1);
+  border: 1.5px solid var(--clr-border, #252830);
+  border-radius: var(--r-md, 8px);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 150ms, border-color 150ms;
+
+  i {
+    color: var(--clr-primary, #ff6b1a);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--clr-primary, #ff6b1a);
+    color: var(--clr-text, #fff);
+  }
+}
+
+@media (max-width: 480px) {
+  .redirect-card {
+    padding: 36px 24px;
+  }
+}

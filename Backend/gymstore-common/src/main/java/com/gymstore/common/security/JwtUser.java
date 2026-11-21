@@ -6,10 +6,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.Optional;
 
-/**
- * Tiện ích lấy thông tin user hiện tại từ SecurityContext (JWT).
- * Dùng ở cart/order/notification để biết ai đang gọi.
- */
 public final class JwtUser {
 
     private JwtUser() {}

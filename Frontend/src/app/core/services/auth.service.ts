@@ -5,6 +5,8 @@ import { environment } from '../../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private keycloak: Keycloak;
+  private _initDone = false;
+  private _initPromise: Promise<boolean> | null = null;
 
   constructor() {
     this.keycloak = new Keycloak({
@@ -14,28 +16,59 @@ export class AuthService {
     });
   }
 
-  /** Gọi 1 lần khi app khởi động. */
-  init(): Promise<boolean> {
-    return this.keycloak.init({
-      onLoad: 'check-sso',
-      silentCheckSsoRedirectUri: `${window.location.origin}/silent-check.html`,
-      pkceMethod: 'S256',
-    }).catch(err => {
-      console.warn('Keycloak SSO init failed, proceeding as unauthenticated:', err);
-      return false;
+  init(mode: 'check-sso' | 'login-required' = 'check-sso'): Promise<boolean> {
+    this._initPromise = this.keycloak
+      .init({
+        onLoad: mode,
+        silentCheckSsoRedirectUri: `${window.location.origin}/silent-check.html`,
+        pkceMethod: 'S256',
+      })
+      .then((auth) => {
+        this._initDone = true;
+        return auth;
+      })
+      .catch((err) => {
+        console.warn('Keycloak SSO init failed:', err);
+        this._initDone = true;
+        return false;
+      });
+    return this._initPromise;
+  }
+
+  waitForInit(): Promise<boolean> {
+    if (this._initDone) return Promise.resolve(true);
+    if (this._initPromise) return this._initPromise.then(() => true);
+    return Promise.resolve(true);
+  }
+
+  login(redirectUri?: string, loginHint?: string): void {
+    this.keycloak.login({
+      redirectUri: redirectUri || window.location.origin + '/home',
+      loginHint,
     });
   }
 
-  login(): void {
-    this.keycloak.login({ redirectUri: window.location.origin + '/home' });
+  logout(redirectUri?: string): void {
+    const refreshToken = this.keycloak.refreshToken;
+    const targetUri = redirectUri || window.location.origin;
+
+    if (refreshToken) {
+      fetch(`${environment.apiUrl}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+        keepalive: true,
+      }).catch(() => {});
+    }
+
+    this.keycloak.logout({ redirectUri: targetUri });
   }
 
-  logout(): void {
-    this.keycloak.logout({ redirectUri: window.location.origin });
-  }
-
-  register(): void {
-    this.keycloak.register();
+  register(redirectUri?: string): void {
+    this.keycloak.login({
+      action: 'register',
+      redirectUri: redirectUri || window.location.origin + '/home',
+    });
   }
 
   get isLoggedIn(): boolean {
@@ -59,7 +92,6 @@ export class AuthService {
     return this.roles.includes(role);
   }
 
-  /** Lấy token hiện tại (auto-refresh nếu sắp hết hạn). */
   async getToken(): Promise<string | undefined> {
     try {
       await this.keycloak.updateToken(30);

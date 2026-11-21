@@ -3,11 +3,24 @@
   "realm": "gymstore",
   "displayName": "GymStore",
   "displayNameHtml": "<div class=\"kc-logo-text\"><span>GymStore</span></div>",
+  "loginTheme": "gymstore",
+  "accountTheme": "keycloak.v2",
+  "adminTheme": "keycloak.v2",
+  "emailTheme": "keycloak",
+  "smtpServer": {
+    "host": "mailhog",
+    "port": "1025",
+    "from": "noreply@gymstore.vn",
+    "fromDisplayName": "GymStore",
+    "ssl": "false",
+    "starttls": "false",
+    "auth": "false"
+  },
   "notBefore": 0,
   "defaultSignatureAlgorithm": "RS256",
   "revokeRefreshToken": false,
   "refreshTokenMaxReuse": 0,
-  "accessTokenLifespan": 300,
+  "accessTokenLifespan": 120,
   "accessTokenLifespanForImplicitFlow": 900,
   "ssoSessionIdleTimeout": 1800,
   "ssoSessionMaxLifespan": 36000,
@@ -32,7 +45,7 @@
   "registrationAllowed": true,
   "registrationEmailAsUsername": true,
   "rememberMe": true,
-  "verifyEmail": false,
+  "verifyEmail": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
@@ -67,6 +80,22 @@
         "id": "44444444-0000-0000-0000-000000000003",
         "name": "CUSTOMER",
         "description": "Khách hàng mua sắm",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "gymstore"
+      },
+      {
+        "id": "44444444-0000-0000-0000-000000000005",
+        "name": "offline_access",
+        "description": "${role_offline-access}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "gymstore"
+      },
+      {
+        "id": "44444444-0000-0000-0000-000000000006",
+        "name": "uma_authorization",
+        "description": "${role_uma_authorization}",
         "composite": false,
         "clientRole": false,
         "containerId": "gymstore"
@@ -123,7 +152,12 @@
         "http://localhost:4202",
         "http://localhost:4202/silent-check.html"
       ],
-      "webOrigins": ["http://localhost:4200", "http://localhost:4201", "http://localhost:4202", "+"],
+      "webOrigins": [
+        "http://localhost:4200",
+        "http://localhost:4201",
+        "http://localhost:4202",
+        "+"
+      ],
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,
@@ -145,8 +179,35 @@
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": true,
       "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "email"],
-      "optionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"]
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "name": "realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String"
+          }
+        }
+      ]
     },
     {
       "id": "33333333-3333-3333-3333-333333333333",
@@ -172,7 +233,13 @@
       "protocol": "openid-connect",
       "attributes": {},
       "fullScopeAllowed": true,
-      "defaultClientScopes": ["web-origins", "acr", "profile", "roles", "email"],
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
       "optionalClientScopes": []
     }
   ],
@@ -182,7 +249,11 @@
       "name": "roles",
       "description": "OpenID Connect scope for add user roles to the access token",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "false", "display.on.consent.screen": "true", "consent.screen.text": "${rolesScopeConsentText}"},
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${rolesScopeConsentText}"
+      },
       "protocolMappers": [
         {
           "id": "66666666-0000-0000-0000-000000000010",
@@ -213,7 +284,10 @@
       "name": "web-origins",
       "description": "OpenID Connect scope for add allowed web origins to the access token",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "false", "display.on.consent.screen": "false"},
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
       "protocolMappers": [
         {
           "id": "66666666-0000-0000-0000-000000000020",
@@ -230,7 +304,10 @@
       "name": "acr",
       "description": "OpenID Connect scope for add acr (authentication context class reference) to the token",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "false", "display.on.consent.screen": "false"},
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
       "protocolMappers": [
         {
           "id": "66666666-0000-0000-0000-000000000030",
@@ -238,7 +315,7 @@
           "protocol": "openid-connect",
           "protocolMapper": "oidc-acr-mapper",
           "consentRequired": false,
-          "config": {"loa.map": "{}"}
+          "config": { "loa.map": "{}" }
         }
       ]
     },
@@ -247,12 +324,67 @@
       "name": "profile",
       "description": "OpenID Connect scope for add user profile",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "true", "consent.screen.text": "${profileScopeConsentText}"},
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${profileScopeConsentText}"
+      },
       "protocolMappers": [
-        {"id":"66666666-0000-0000-0000-000000000040","name":"family name","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"lastName","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true","json.field.label":"family_name"}},
-        {"id":"66666666-0000-0000-0000-000000000041","name":"given name","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"firstName","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true","json.field.label":"given_name"}},
-        {"id":"66666666-0000-0000-0000-000000000042","name":"username","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"username","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true","json.field.label":"preferred_username"}},
-        {"id":"66666666-0000-0000-0000-000000000043","name":"locale","protocol":"openid-connect","protocolMapper":"oidc-usermodel-attribute-mapper","consentRequired":false,"config":{"user.attribute":"locale","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true"}}
+        {
+          "id": "66666666-0000-0000-0000-000000000040",
+          "name": "family name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "lastName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "json.field.label": "family_name"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000041",
+          "name": "given name",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "firstName",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "json.field.label": "given_name"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000042",
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "json.field.label": "preferred_username"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000043",
+          "name": "locale",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "locale",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
       ]
     },
     {
@@ -260,74 +392,209 @@
       "name": "email",
       "description": "OpenID Connect scope for add user email",
       "protocol": "openid-connect",
-      "attributes": {"include.in.token.scope": "true", "display.on.consent.screen": "true", "consent.screen.text":"${emailScopeConsentText}"},
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${emailScopeConsentText}"
+      },
       "protocolMappers": [
-        {"id":"66666666-0000-0000-0000-000000000050","name":"email","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"email","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true"}},
-        {"id":"66666666-0000-0000-0000-000000000051","name":"email verified","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"emailVerified","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true"}}
+        {
+          "id": "66666666-0000-0000-0000-000000000050",
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000051",
+          "name": "email verified",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "emailVerified",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
       ]
     },
     {
-      "id":"66666666-0000-0000-0000-000000000006",
-      "name":"address","description":"OpenID Connect scope for add user address","protocol":"openid-connect","attributes":{"include.in.token.scope":"false","display.on.consent.screen":"true","consent.screen.text":"${addressScopeConsentText}"},
-      "protocolMappers":[{"id":"66666666-0000-0000-0000-000000000060","name":"formatted address","protocol":"openid-connect","protocolMapper":"oidc-address-mapper","consentRequired":false,"config":{"user.attribute":"formatted","userinfo.token.claim":"true"}}]
-    },
-    {
-      "id":"66666666-0000-0000-0000-000000000007",
-      "name":"phone","description":"OpenID Connect scope for add user phone number","protocol":"openid-connect","attributes":{"include.in.token.scope":"false","display.on.consent.screen":"true","consent.screen.text":"${phoneScopeConsentText}"},
-      "protocolMappers":[
-        {"id":"66666666-0000-0000-0000-000000000070","name":"phone number","protocol":"openid-connect","protocolMapper":"oidc-usermodel-attribute-mapper","consentRequired":false,"config":{"user.attribute":"phoneNumber","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true"}},
-        {"id":"66666666-0000-0000-0000-000000000071","name":"phone number verified","protocol":"openid-connect","protocolMapper":"oidc-usermodel-attribute-mapper","consentRequired":false,"config":{"user.attribute":"phoneNumberVerified","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true"}}
+      "id": "66666666-0000-0000-0000-000000000006",
+      "name": "address",
+      "description": "OpenID Connect scope for add user address",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${addressScopeConsentText}"
+      },
+      "protocolMappers": [
+        {
+          "id": "66666666-0000-0000-0000-000000000060",
+          "name": "formatted address",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-address-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "formatted",
+            "userinfo.token.claim": "true"
+          }
+        }
       ]
     },
     {
-      "id":"66666666-0000-0000-0000-000000000008",
-      "name":"offline_access","description":"OpenID Connect scope for add offline access","protocol":"openid-connect","attributes":{"consent.screen.text":"${offlineAccessScopeConsentText}","display.on.consent.screen":"true"}}
+      "id": "66666666-0000-0000-0000-000000000007",
+      "name": "phone",
+      "description": "OpenID Connect scope for add user phone number",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "consent.screen.text": "${phoneScopeConsentText}"
+      },
+      "protocolMappers": [
+        {
+          "id": "66666666-0000-0000-0000-000000000070",
+          "name": "phone number",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "phoneNumber",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000071",
+          "name": "phone number verified",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "phoneNumberVerified",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
     },
     {
-      "id":"66666666-0000-0000-0000-000000000009",
-      "name":"microprofile-jwt","description":"Microprofile JWT scope","protocol":"openid-connect","attributes":{"include.in.token.scope":"false","display.on.consent.screen":"false"},
-      "protocolMappers":[
-        {"id":"66666666-0000-0000-0000-000000000090","name":"groups","protocol":"openid-connect","protocolMapper":"oidc-usermodel-realm-role-mapper","consentRequired":false,"config":{"user.attribute":"foo","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true","multivalued":"true","introspection.token.claim":"true","json.field.label":"groups"}},
-        {"id":"66666666-0000-0000-0000-000000000091","name":"upn","protocol":"openid-connect","protocolMapper":"oidc-usermodel-property-mapper","consentRequired":false,"config":{"user.attribute":"username","id.token.claim":"true","access.token.claim":"true","userinfo.token.claim":"true","json.field.label":"upn"}}
+      "id": "66666666-0000-0000-0000-000000000008",
+      "name": "offline_access",
+      "description": "OpenID Connect scope for add offline access",
+      "protocol": "openid-connect",
+      "attributes": {
+        "consent.screen.text": "${offlineAccessScopeConsentText}",
+        "display.on.consent.screen": "true"
+      }
+    },
+    {
+      "id": "66666666-0000-0000-0000-000000000009",
+      "name": "microprofile-jwt",
+      "description": "Microprofile JWT scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "id": "66666666-0000-0000-0000-000000000090",
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "foo",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "multivalued": "true",
+            "introspection.token.claim": "true",
+            "json.field.label": "groups"
+          }
+        },
+        {
+          "id": "66666666-0000-0000-0000-000000000091",
+          "name": "upn",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-property-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "json.field.label": "upn"
+          }
+        }
       ]
     }
   ],
-  "defaultDefaultClientScopes": ["web-origins", "acr", "profile", "roles", "email"],
-  "defaultOptionalClientScopes": ["address", "phone", "offline_access", "microprofile-jwt"],
+  "defaultDefaultClientScopes": [
+    "web-origins",
+    "acr",
+    "profile",
+    "roles",
+    "email"
+  ],
+  "defaultOptionalClientScopes": [
+    "address",
+    "phone",
+    "offline_access",
+    "microprofile-jwt"
+  ],
   "users": [
     {
       "id": "55555555-0000-0000-0000-000000000001",
-      "username": "admin@gymstore.local",
+      "username": "admin",
       "enabled": true,
-      "email": "admin@gymstore.local",
+      "email": "admin@gymstore.vn",
       "emailVerified": true,
       "firstName": "Admin",
       "lastName": "GymStore",
-      "credentials": [{"type": "password", "value": "admin", "temporary": false}],
+      "credentials": [
+        { "type": "password", "value": "admin", "temporary": false }
+      ],
       "realmRoles": ["ADMIN", "default-roles-gymstore"],
       "requiredActions": []
     },
     {
       "id": "55555555-0000-0000-0000-000000000002",
-      "username": "staff@gymstore.local",
+      "username": "staff",
       "enabled": true,
-      "email": "staff@gymstore.local",
+      "email": "staff@gymstore.vn",
       "emailVerified": true,
       "firstName": "Staff",
       "lastName": "GymStore",
-      "credentials": [{"type": "password", "value": "staff", "temporary": false}],
+      "credentials": [
+        { "type": "password", "value": "staff", "temporary": false }
+      ],
       "realmRoles": ["STAFF", "default-roles-gymstore"],
       "requiredActions": []
     },
     {
       "id": "55555555-0000-0000-0000-000000000003",
-      "username": "customer@gymstore.local",
+      "username": "customer",
       "enabled": true,
-      "email": "customer@gymstore.local",
+      "email": "customer@gymstore.vn",
       "emailVerified": true,
-      "firstName": "Khách",
-      "lastName": "Hàng",
-      "credentials": [{"type": "password", "value": "customer", "temporary": false}],
+      "firstName": "Nguyen",
+      "lastName": "Van A",
+      "credentials": [
+        { "type": "password", "value": "customer", "temporary": false }
+      ],
       "realmRoles": ["CUSTOMER", "default-roles-gymstore"],
       "requiredActions": []
     }

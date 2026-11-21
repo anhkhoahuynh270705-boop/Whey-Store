@@ -2,9 +2,6 @@ package com.gymstore.common.exception.code;
 
 import com.gymstore.common.exception.IErrorCode;
 
-/**
- * Danh sách mã lỗi hệ thống chung (Common Error Enums) dùng chung cho toàn bộ microservices.
- */
 public enum CommonErrorCode implements IErrorCode {
 
     UNAUTHORIZED("SYS_401", "Yêu cầu đăng nhập để thực hiện thao tác", 401),

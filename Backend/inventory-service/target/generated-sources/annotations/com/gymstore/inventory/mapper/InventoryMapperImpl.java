@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-11-16T13:39:19+0700",
+    date = "2026-11-20T09:37:03+0700",
     comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.46.200.v20261008-1115, environment: Java 25.0.4.1 (Eclipse Adoptium)"
 )
 @Component
@@ -49,11 +49,11 @@ public class InventoryMapperImpl implements InventoryMapper {
 
         InventoryItem inventoryItem = new InventoryItem();
 
-        inventoryItem.setProductId( request.productId() );
-        inventoryItem.setSku( request.sku() );
         if ( request.availableQty() != null ) {
             inventoryItem.setAvailableQty( request.availableQty() );
         }
+        inventoryItem.setProductId( request.productId() );
+        inventoryItem.setSku( request.sku() );
 
         inventoryItem.setReservedQty( 0 );
 
@@ -66,10 +66,10 @@ public class InventoryMapperImpl implements InventoryMapper {
             return;
         }
 
-        entity.setProductId( dto.productId() );
-        entity.setSku( dto.sku() );
         entity.setAvailableQty( dto.availableQty() );
+        entity.setProductId( dto.productId() );
         entity.setReservedQty( dto.reservedQty() );
+        entity.setSku( dto.sku() );
     }
 
     @Override

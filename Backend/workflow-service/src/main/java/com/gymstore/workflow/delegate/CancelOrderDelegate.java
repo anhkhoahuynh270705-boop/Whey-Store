@@ -7,10 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-/**
- * Task: Hủy đơn. Dùng chung cho các nhánh: timeout, thanh toán thất bại.
- * Lý do hủy được lưu trong process variable "cancelReason".
- */
 @Component("cancelOrderDelegate")
 public class CancelOrderDelegate implements JavaDelegate {
 

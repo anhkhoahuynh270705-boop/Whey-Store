@@ -45,11 +45,9 @@ public class PaymentServiceImpl implements IPaymentService {
 
     private PaymentResult doProcess(ProcessPaymentRequest req) {
         boolean success = determineSuccess(req);
-        Payment payment = paymentMapper.toEntity(req);
-        payment.setStatus(success ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
-        payment.setTransactionId(success ? "TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase() : null);
-        payment.setProviderResponse(success ? "OK" : "INSUFFICIENT_FUNDS");
-        payment = paymentRepository.save(payment);
+        String txnId = success ? "TXN-" + UUID.randomUUID().toString().substring(0, 12).toUpperCase() : null;
+        String response = success ? "OK" : "INSUFFICIENT_FUNDS";
+        Payment payment = paymentRepository.save(paymentMapper.toEntity(req, success, txnId, response));
         log.info("Payment for order {} - {}: {}", req.orderId(), req.paymentMethod(), payment.getStatus());
         return paymentMapper.toPaymentResult(payment);
     }

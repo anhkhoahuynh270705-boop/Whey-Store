@@ -1,7 +1,7 @@
 import { HttpErrorResponse, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { ToastService } from '../services/toast.service';
+import { ToastService } from '../../shared/toast/service/toast.service';
 
 export const errorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -19,10 +19,9 @@ export const errorInterceptor: HttpInterceptorFn = (
       console.error('Full Error Object:', error);
       console.groupEnd();
 
-      // Skip silent 404s for guest cart checking
-      const isSilentCart404 = req.url.includes('/cart') && error.status === 404;
+      const isSilentCart = req.url.includes('/cart') && (error.status === 404 || error.status === 401);
 
-      if (!isSilentCart404) {
+      if (!isSilentCart) {
         let msg = error.error?.message;
         if (!msg) {
           if (error.status === 0) {

@@ -9,10 +9,6 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
-/**
- * CORS toàn cục cho gateway.
- * Các downstream service không cần cấu hình CORS vì request đi qua gateway.
- */
 @Configuration
 public class CorsGlobalConfig {
 
@@ -25,7 +21,7 @@ public class CorsGlobalConfig {
         config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        config.setExposedHeaders(List.of("Authorization", "Content-Disposition", "X-Cart-Id"));
         config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 

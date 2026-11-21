@@ -13,11 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * Resource server (servlet) cho product-service.
- * - GET sản phẩm/danh mục/thương hiệu: public.
- * - Viết/xoá: yêu cầu JWT + @PreAuthorize('ADMIN') ở controller.
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -38,7 +33,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /** Chuyển realm_access.roles trong JWT thành GrantedAuthority (ROLE_xxx). */
+    /** Chuyển realm_access.roles trong JWT thành GrantedAuthority*/
     @Bean
     Converter<Jwt, AbstractAuthenticationToken> keycloakConverter() {
         return KeycloakRealmRolesConverter.forServlet();

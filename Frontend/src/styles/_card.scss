@@ -1,0 +1,23 @@
+/*
+   CARD
+*/
+.card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--r-md);
+  padding: var(--sp-lg);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+
+  /* Subtle top highlight line */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}

@@ -21,9 +21,7 @@
 
     <div class="sidebar-footer">
       <div class="user-info">
-        <span class="user-avatar">{{
-          (auth.fullName ?? auth.username ?? 'A')[0].toUpperCase()
-        }}</span>
+        <span class="user-avatar">{{ userInitial }}</span>
         <div class="user-meta">
           <span class="user-name">{{ auth.fullName ?? auth.username }}</span>
           <span class="user-role">Administrator</span>
@@ -41,7 +39,7 @@
         <span></span><span></span><span></span>
       </button>
       <div class="topbar-title">
-        <span>GymStore</span>
+        <span>Gainova</span>
         <span class="topbar-sep">/</span>
         <span class="topbar-sub">Quản trị hệ thống</span>
       </div>
@@ -62,4 +60,5 @@
     </main>
   </div>
   <app-toast />
+  <app-confirm-dialog />
 </div>

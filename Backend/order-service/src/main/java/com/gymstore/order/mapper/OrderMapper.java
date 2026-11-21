@@ -52,4 +52,14 @@ public interface OrderMapper {
     @Mapping(target = "order", ignore = true)
     @Mapping(target = "subtotal", expression = "java(item.unitPrice().multiply(java.math.BigDecimal.valueOf(item.quantity())))")
     OrderItem toItemEntity(CheckoutItem item);
+
+    /**
+     * Tạo bản ghi lịch sử trạng thái đơn hàng.
+     */
+    default OrderStatusHistory createHistory(com.gymstore.order.enums.OrderStatus status, String note) {
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setStatus(status);
+        history.setNote(note);
+        return history;
+    }
 }

@@ -1,15 +1,16 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AdminProductsService } from '../products.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Brand, Category, Product } from '../../../core/models/product.model';
+import { Brand, Category, Product } from '../model/product.model';
+import { ImgCountPipe } from '../helper/img-count.pipe';
+import { AdminProductsService } from '../service/products.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-admin-product-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ImgCountPipe],
   templateUrl: './admin-product-edit.component.html',
   styleUrl: './admin-product-edit.component.scss',
 })
@@ -20,8 +21,7 @@ export class AdminProductEditComponent implements OnInit {
   brands: Brand[] = [];
   initLoading = true;
   saving = false;
-  errorMsg = '';
-  successMsg = '';
+  imageSlots: ({ id: number | null; url: string } | null)[] = [null, null, null, null];
 
   private productsService = inject(AdminProductsService);
   private toast = inject(ToastService);
@@ -71,12 +71,20 @@ export class AdminProductEditComponent implements OnInit {
           flavor: p.flavor,
           servingSize: p.servingSize,
           status: p.status,
-          imageUrl: p.images?.find((i) => i.isPrimary)?.imageUrl ?? p.images?.[0]?.imageUrl ?? '',
         });
+
+        // Điền ảnh vào slots theo thứ tự, primary đứng đầu
+        const sorted = [...(p.images ?? [])].sort((a, b) =>
+          a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1,
+        );
+        sorted.slice(0, 4).forEach((img, i) => {
+          this.imageSlots[i] = { id: img.id, url: img.imageUrl };
+        });
+
         done();
       },
       error: () => {
-        this.errorMsg = 'Không tải được sản phẩm';
+        this.toast.error('Không tải được thông tin sản phẩm');
         done();
       },
     });
@@ -94,13 +102,44 @@ export class AdminProductEditComponent implements OnInit {
       flavor: [''],
       servingSize: [null],
       status: ['ACTIVE', Validators.required],
-      imageUrl: [''],
     });
   }
 
   f(name: string) {
     return this.form.get(name);
   }
+
+  // ── Image management ────────────────────────────────
+
+  triggerFilePick(index: number): void {
+    const input = document.getElementById(`img-input-${index}`) as HTMLInputElement;
+    input?.click();
+  }
+
+  onFilePicked(event: Event, index: number): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.toast.error('Chỉ chấp nhận file ảnh');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Giữ lại id cũ nếu đang replace ảnh đã có
+      const existingId = this.imageSlots[index]?.id ?? null;
+      this.imageSlots[index] = { id: existingId, url: reader.result as string };
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(index: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.imageSlots[index] = null;
+    this.cdr.markForCheck();
+  }
+
+  // ── Submit ──────────────────────────────────────────
 
   submit(): void {
     if (this.form.invalid) {
@@ -109,12 +148,15 @@ export class AdminProductEditComponent implements OnInit {
     }
     if (!this.product) return;
     this.saving = true;
-    this.errorMsg = '';
     const v = this.form.value;
+
+    const images = this.imageSlots
+      .map((slot, i) => (slot ? { id: slot.id, imageUrl: slot.url, isPrimary: i === 0 } : null))
+      .filter(Boolean) as { id: number | null; imageUrl: string; isPrimary: boolean }[];
 
     const payload = {
       name: v.name,
-      slug: this.product?.slug ?? '',
+      slug: this.product.slug ?? '',
       description: v.description || null,
       categoryId: Number(v.categoryId),
       brandId: Number(v.brandId),
@@ -124,22 +166,19 @@ export class AdminProductEditComponent implements OnInit {
       flavor: v.flavor || null,
       servingSize: v.servingSize ? Number(v.servingSize) : null,
       status: v.status,
-      images: v.imageUrl
-        ? [{ id: this.product?.images?.find((i) => i.isPrimary)?.id ?? null, imageUrl: v.imageUrl, isPrimary: true }]
-        : (this.product?.images ?? []),
+      images,
     };
 
     this.productsService.updateProduct(this.product.id, payload).subscribe({
       next: () => {
         this.saving = false;
-        this.successMsg = 'Lưu thành công!';
         this.toast.success('Cập nhật sản phẩm thành công!');
         this.cdr.markForCheck();
         setTimeout(() => this.router.navigate(['/products', this.product!.id]), 1000);
       },
       error: (err: any) => {
         this.saving = false;
-        this.errorMsg = err?.error?.message ?? 'Lỗi khi lưu, vui lòng thử lại';
+        this.toast.error(err?.error?.message ?? 'Lỗi khi lưu');
         this.cdr.markForCheck();
       },
     });
@@ -148,7 +187,6 @@ export class AdminProductEditComponent implements OnInit {
   cancel(): void {
     this.router.navigate(['/products', this.product?.id ?? '']);
   }
-
   goList(): void {
     this.router.navigate(['/products']);
   }

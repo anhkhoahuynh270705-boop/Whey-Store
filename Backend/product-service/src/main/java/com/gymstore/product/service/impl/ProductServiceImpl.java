@@ -136,15 +136,8 @@ public class ProductServiceImpl implements IProductService {
         Brand brand = brandRepository.findById(request.brandId())
                 .orElseThrow(() -> new ResourceNotFoundException("Thương hiệu", request.brandId()));
 
-        product.setName(request.name());
+        mapper.updateEntityFromRequest(request, product);
         product.setSlug(slug);
-        product.setDescription(request.description());
-        product.setPrice(request.price());
-        product.setSalePrice(request.salePrice());
-        product.setWeightGrams(request.weightGrams());
-        product.setFlavor(request.flavor());
-        product.setServingSize(request.servingSize());
-        product.setStatus(mapper.stringToEnum(request.status()));
         product.setCategory(category);
         product.setBrand(brand);
 

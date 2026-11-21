@@ -48,4 +48,11 @@ public interface InventoryMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     StockReservation toReservation(String orderId, ReserveItem item);
+
+    /**
+     * Tạo bản ghi biến động kho.
+     */
+    default com.gymstore.inventory.entity.StockMovement toStockMovement(Long productId, String orderId, int quantity, com.gymstore.inventory.enums.StockMovementType type) {
+        return new com.gymstore.inventory.entity.StockMovement(productId, orderId, quantity, type);
+    }
 }

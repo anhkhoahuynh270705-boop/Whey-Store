@@ -13,12 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * cart-service:
- * - /api/cart/** permitAll (khách vãng lai dùng giỏ guest theo header X-Cart-Id).
- *   Nếu có JWT hợp lệ → tự động dùng giỏ của user.
- * - /api/cart/merge yêu cầu đã đăng nhập (CUSTOMER).
- */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

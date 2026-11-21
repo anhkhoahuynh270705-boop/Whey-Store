@@ -1,0 +1,48 @@
+/*
+   ADMIN TABLE (shared)
+*/
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--r-md);
+  border: 1px solid var(--clr-border);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+
+  thead tr {
+    background: var(--clr-surface-2);
+    border-bottom: 2px solid var(--clr-border);
+  }
+
+  th {
+    padding: 13px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--clr-primary);
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--clr-border);
+    font-size: 13.5px;
+    color: var(--clr-text-soft);
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background var(--t-fast);
+    &:hover {
+      background: var(--clr-surface-2);
+    }
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}

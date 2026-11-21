@@ -1,4 +1,13 @@
 # API Gateway - Docker Configuration
+keycloak:
+  server-url: http://keycloak:8080
+
+app:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/keycloak_db}
+    username: keycloak_user
+    password: keycloak_pass
+
 spring:
   security:
     oauth2:

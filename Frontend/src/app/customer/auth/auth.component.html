@@ -1,0 +1,24 @@
+<!-- Trang này chỉ hiển thị trong tích tắc trước khi redirect sang Keycloak -->
+<div class="auth-redirect">
+  <div class="redirect-card">
+    <a routerLink="/home" class="auth-logo">
+      <i class="fas fa-dumbbell"></i>
+      <span>GYM<span class="accent">STORE</span></span>
+    </a>
+
+    <div class="spinner">
+      <i class="fas fa-circle-notch fa-spin"></i>
+    </div>
+
+    <p class="redirect-text">Đang chuyển hướng tới cổng xác thực an toàn…</p>
+
+    <div class="redirect-actions">
+      <button class="btn-primary" (click)="goLogin()">
+        <i class="fas fa-sign-in-alt"></i> Đăng nhập
+      </button>
+      <button class="btn-secondary" (click)="goRegister()">
+        <i class="fas fa-user-plus"></i> Đăng ký tài khoản mới
+      </button>
+    </div>
+  </div>
+</div>

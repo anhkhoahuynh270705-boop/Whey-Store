@@ -1,0 +1,54 @@
+/*
+   UTILITY CLASSES
+*/
+.text-muted {
+  color: var(--clr-text-muted) !important;
+}
+.text-soft {
+  color: var(--clr-text-soft) !important;
+}
+.text-primary {
+  color: var(--clr-primary) !important;
+}
+.text-success {
+  color: var(--clr-success) !important;
+}
+.text-danger {
+  color: var(--clr-danger) !important;
+}
+.text-warning {
+  color: var(--clr-warning) !important;
+}
+.small {
+  font-size: 13px !important;
+}
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.price {
+  color: var(--clr-primary);
+  font-weight: 800;
+  font-family: 'Barlow', sans-serif;
+}
+.price-old {
+  color: var(--clr-text-muted);
+  text-decoration: line-through;
+  font-size: 12.5px;
+  margin-left: 6px;
+  font-weight: 400;
+}
+
+.section-title {
+  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+  font-weight: 800;
+  margin-bottom: var(--sp-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .title-icon {
+    color: var(--clr-primary);
+    font-size: 1.1em;
+  }
+}

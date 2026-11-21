@@ -16,13 +16,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebExceptionHandler;
 import reactor.core.publisher.Mono;
 
-/**
- * Global error handler for Spring Cloud Gateway (WebFlux).
- * Catches unhandled exceptions and returns a standard {@link ErrorResponse} body.
- *
- * <p>Order(-1) puts this before the default Spring Boot error handler (Order(-2) is taken by
- * DefaultErrorWebExceptionHandler when spring-boot-starter-webflux is on the classpath).
- */
 @Component
 @Order(-1)
 public class GlobalExceptionHandler implements WebExceptionHandler {
@@ -45,9 +38,17 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
 
         if (ex instanceof ResponseStatusException rse) {
             status = rse.getStatusCode().value();
-            error = rse.getReason() != null ? rse.getReason() : HttpStatus.resolve(status) != null
-                    ? HttpStatus.resolve(status).getReasonPhrase() : "Error";
+            error = rse.getReason() != null ? rse.getReason()
+                    : HttpStatus.resolve(status) != null ? HttpStatus.resolve(status).getReasonPhrase() : "Error";
             message = rse.getMessage();
+        } else if (ex instanceof IllegalArgumentException) {
+            status = 400;
+            error = "BAD_REQUEST";
+            message = ex.getMessage();
+        } else if (ex instanceof IllegalStateException) {
+            status = 409;
+            error = "CONFLICT";
+            message = ex.getMessage();
         } else {
             log.error("Unhandled gateway error: ", ex);
             status = 500;

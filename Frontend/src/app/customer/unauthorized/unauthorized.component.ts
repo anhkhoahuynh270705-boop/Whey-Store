@@ -1,5 +1,6 @@
-import { Component, ChangeDetectorRef, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
+
 @Component({
   selector: 'app-unauthorized',
   standalone: true,
@@ -8,8 +9,13 @@ import { Router } from '@angular/router';
   styleUrl: './unauthorized.component.scss',
 })
 export class UnauthorizedComponent {
-  private router = inject(Router);
-  protected cdr = inject(ChangeDetectorRef);
-  goHome(): void { this.router.navigate(['/']); }
-  login(): void { this.router.navigate(['/auth/login']); }
+  private auth = inject(AuthService);
+
+  goHome(): void {
+    window.location.href = window.location.origin + '/home';
+  }
+
+  login(): void {
+    this.auth.login(window.location.href);
+  }
 }

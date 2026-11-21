@@ -1,15 +1,18 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AdminProductsService } from '../products.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Brand, Category } from '../../../core/models/product.model';
+import { ReactiveFormsModule, FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { Brand, Category } from '../model/product.model';
+import { ImgCountPipe } from '../helper/img-count.pipe';
+import { AdminProductsService } from '../service/products.service';
+import { AdminInventoryService } from '../../inventory/service/inventory.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-admin-product-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ImgCountPipe],
   templateUrl: './admin-product-create.component.html',
   styleUrl: './admin-product-create.component.scss',
 })
@@ -19,10 +22,11 @@ export class AdminProductCreateComponent implements OnInit {
   brands: Brand[] = [];
   loading = false;
   initLoading = true;
-  errorMsg = '';
-  successMsg = '';
+
+  imageSlots: (string | null)[] = [null, null, null, null];
 
   private productsService = inject(AdminProductsService);
+  private inventoryService = inject(AdminInventoryService);
   private toast = inject(ToastService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
@@ -37,7 +41,6 @@ export class AdminProductCreateComponent implements OnInit {
         this.cdr.markForCheck();
       }
     };
-
     this.productsService.getCategories().subscribe({
       next: (c) => {
         this.categories = c;
@@ -62,17 +65,72 @@ export class AdminProductCreateComponent implements OnInit {
       brandId: [null, Validators.required],
       price: [null, [Validators.required, Validators.min(0)]],
       salePrice: [null],
-      weightGrams: [null],
-      flavor: [''],
-      servingSize: [null],
       status: ['ACTIVE', Validators.required],
-      imageUrl: [''],
+      variants: this.fb.array([this.newVariant()]),
     });
+  }
+
+  // ── Variants ──────────────────────────────────────────
+
+  get variants(): FormArray {
+    return this.form.get('variants') as FormArray;
+  }
+
+  newVariant(): FormGroup {
+    return this.fb.group({
+      flavor: ['', Validators.required],
+      weightGrams: [null, [Validators.required, Validators.min(1)]],
+      servingSize: [null],
+      sku: ['', Validators.required],
+      stock: [0, [Validators.required, Validators.min(0)]],
+    });
+  }
+
+  addVariant(): void {
+    this.variants.push(this.newVariant());
+  }
+
+  removeVariant(i: number): void {
+    if (this.variants.length > 1) this.variants.removeAt(i);
+    else this.toast.warning('Sản phẩm cần ít nhất 1 hương vị / kích thước');
+  }
+
+  vf(i: number, field: string) {
+    return this.variants.at(i).get(field);
+  }
+
+  // ── Images ────────────────────────────────────────────
+
+  triggerFilePick(index: number): void {
+    (document.getElementById(`img-input-${index}`) as HTMLInputElement)?.click();
+  }
+
+  onFilePicked(event: Event, index: number): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      this.toast.error('Chỉ chấp nhận file ảnh');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imageSlots[index] = reader.result as string;
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeImage(index: number, event: MouseEvent): void {
+    event.stopPropagation();
+    this.imageSlots[index] = null;
+    this.cdr.markForCheck();
   }
 
   f(name: string) {
     return this.form.get(name);
   }
+
+  // ── Submit ────────────────────────────────────────────
 
   submit(): void {
     if (this.form.invalid) {
@@ -80,10 +138,16 @@ export class AdminProductCreateComponent implements OnInit {
       return;
     }
     this.loading = true;
-    this.errorMsg = '';
     const v = this.form.value;
 
-    const payload = {
+    // Dùng variant đầu tiên làm giá trị mặc định cho product-level fields
+    const firstVariant = v.variants[0];
+
+    const images = this.imageSlots
+      .map((url, i) => (url ? { id: null, imageUrl: url, isPrimary: i === 0 } : null))
+      .filter(Boolean) as { id: null; imageUrl: string; isPrimary: boolean }[];
+
+    const productPayload = {
       name: v.name,
       slug: '',
       description: v.description || null,
@@ -91,24 +155,40 @@ export class AdminProductCreateComponent implements OnInit {
       brandId: Number(v.brandId),
       price: Number(v.price),
       salePrice: v.salePrice ? Number(v.salePrice) : null,
-      weightGrams: v.weightGrams ? Number(v.weightGrams) : null,
-      flavor: v.flavor || null,
-      servingSize: v.servingSize ? Number(v.servingSize) : null,
+      weightGrams: firstVariant.weightGrams ? Number(firstVariant.weightGrams) : null,
+      flavor: firstVariant.flavor || null,
+      servingSize: firstVariant.servingSize ? Number(firstVariant.servingSize) : null,
       status: v.status,
-      images: v.imageUrl ? [{ id: null, imageUrl: v.imageUrl, isPrimary: true }] : [],
+      images,
     };
 
-    this.productsService.createProduct(payload).subscribe({
+    this.productsService.createProduct(productPayload).subscribe({
       next: (product) => {
-        this.loading = false;
-        this.successMsg = 'Tạo sản phẩm thành công!';
-        this.toast.success('Tạo sản phẩm thành công!');
-        this.cdr.markForCheck();
-        setTimeout(() => this.router.navigate(['/products', product.id]), 1000);
+        // Tạo inventory item cho từng variant song song
+        const inventoryRequests = v.variants.map((variant: any) =>
+          this.inventoryService.createItem(product.id, variant.sku.trim(), Number(variant.stock)),
+        );
+
+        forkJoin(inventoryRequests).subscribe({
+          next: () => {
+            this.loading = false;
+            this.toast.success('Tạo sản phẩm và cập nhật kho thành công!');
+            this.cdr.markForCheck();
+            setTimeout(() => this.router.navigate(['/products', product.id]), 800);
+          },
+          error: () => {
+            this.loading = false;
+            this.toast.warning(
+              'Sản phẩm đã tạo nhưng có lỗi khi tạo kho — vui lòng kiểm tra lại tồn kho',
+            );
+            this.cdr.markForCheck();
+            setTimeout(() => this.router.navigate(['/products', product.id]), 1200);
+          },
+        });
       },
       error: (err: any) => {
         this.loading = false;
-        this.errorMsg = err?.error?.message ?? 'Lỗi khi tạo sản phẩm, vui lòng thử lại';
+        this.toast.error(err?.error?.message ?? 'Lỗi khi tạo sản phẩm');
         this.cdr.markForCheck();
       },
     });

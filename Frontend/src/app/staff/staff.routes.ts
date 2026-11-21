@@ -8,7 +8,7 @@ export const staffRoutes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./dashboard/staff-dashboard.component').then(m => m.StaffDashboardComponent),
+        loadComponent: () => import('./dashboard/staff-dashboard/staff-dashboard.component').then(m => m.StaffDashboardComponent),
       },
       {
         path: 'orders',

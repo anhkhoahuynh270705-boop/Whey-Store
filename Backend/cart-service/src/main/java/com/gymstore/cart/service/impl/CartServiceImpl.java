@@ -6,14 +6,17 @@ import com.gymstore.cart.dto.response.CartItem;
 import com.gymstore.cart.dto.request.CartItemRequest;
 import com.gymstore.cart.dto.response.ProductSummary;
 import com.gymstore.cart.dto.response.CartIdentity;
+import com.gymstore.cart.helper.CartHelper;
 import com.gymstore.cart.mapper.CartMapper;
 import com.gymstore.cart.service.ICartService;
 import com.gymstore.common.security.JwtUser;
 
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -21,27 +24,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Implementation of cart service.
- * Cart stored in Redis Hash by owner (user or guest), TTL 7 days.
- * Key: cart:user:{userId} or cart:guest:{guestId}. Field = productId, value = CartItem (JSON).
- */
+import lombok.AccessLevel;
+
 @Service
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CartServiceImpl implements ICartService {
 
     private static final Duration TTL = Duration.ofDays(7);
 
-    private final RedisTemplate<String, Object> redis;
-    private final ProductClient productClient;
-    private final CartMapper cartMapper;
-
-    public CartServiceImpl(RedisTemplate<String, Object> redis,
-                           ProductClient productClient,
-                           CartMapper cartMapper) {
-        this.redis = redis;
-        this.productClient = productClient;
-        this.cartMapper = cartMapper;
-    }
+    RedisTemplate<String, Object> redis;
+    ProductClient productClient;
+    CartMapper cartMapper;
 
     @Override
     public CartIdentity resolveIdentity(String guestIdHeader) {
@@ -66,7 +60,11 @@ public class CartServiceImpl implements ICartService {
             }
         }
         items.sort(Comparator.comparing(CartItem::productId));
-        return buildCartDto(cartKey, items);
+        return cartMapper.toCartDto(
+                CartHelper.extractOwner(cartKey),
+                items,
+                CartHelper.calculateTotalAmount(items),
+                CartHelper.calculateTotalQuantity(items));
     }
 
     @Override
@@ -74,7 +72,7 @@ public class CartServiceImpl implements ICartService {
         ProductSummary product = productClient.getProduct(request.productId());
         int qty = request.quantity();
 
-        CartItem existing = readItem(cartKey, request.productId());
+        CartItem existing = CartHelper.readItem(redis, cartKey, request.productId());
         if (existing != null) {
             qty += existing.quantity();
         }
@@ -90,7 +88,7 @@ public class CartServiceImpl implements ICartService {
         if (quantity <= 0) {
             return removeItem(cartKey, productId);
         }
-        CartItem existing = readItem(cartKey, productId);
+        CartItem existing = CartHelper.readItem(redis, cartKey, productId);
         if (existing == null) {
             return addItem(cartKey, new CartItemRequest(productId, quantity));
         }
@@ -118,7 +116,7 @@ public class CartServiceImpl implements ICartService {
         Map<Object, Object> guestItems = redis.<Object, Object>opsForHash().entries(guestKey);
         for (Object v : guestItems.values()) {
             if (v instanceof CartItem guestItem) {
-                CartItem existing = readItem(userKey, guestItem.productId());
+                CartItem existing = CartHelper.readItem(redis, userKey, guestItem.productId());
                 CartItem merged = cartMapper.mergeItem(existing, guestItem);
                 redis.opsForHash().put(userKey, String.valueOf(guestItem.productId()), merged);
             }
@@ -128,30 +126,4 @@ public class CartServiceImpl implements ICartService {
         return getCart(userKey);
     }
 
-    // Helper methods
-
-    private CartItem readItem(String cartKey, Long productId) {
-        Object v = redis.opsForHash().get(cartKey, String.valueOf(productId));
-        return v instanceof CartItem ci ? ci : null;
-    }
-
-    private CartDto buildCartDto(String cartKey, List<CartItem> items) {
-        BigDecimal total = items.stream()
-                .map(i -> effectivePrice(i).multiply(BigDecimal.valueOf(i.quantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        int totalQty = items.stream().mapToInt(CartItem::quantity).sum();
-        String owner = extractOwner(cartKey);
-        return cartMapper.toCartDto(owner, items, total, totalQty);
-    }
-
-    private BigDecimal effectivePrice(CartItem item) {
-        return item.salePrice() != null ? item.salePrice() : item.price();
-    }
-
-    private String extractOwner(String cartKey) {
-        if (cartKey.startsWith("cart:user:")) {
-            return cartKey.substring("cart:user:".length());
-        }
-        return "guest:" + cartKey.substring("cart:guest:".length());
-    }
 }

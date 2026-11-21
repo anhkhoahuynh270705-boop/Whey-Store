@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Parent POM đa module cho GymStore. Kế thừa spring-boot-starter-parent
-     để được quản lý phiên bản phụ thuộc. Các module con chỉ cần khai báo artifactId. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -95,7 +93,7 @@
                 <artifactId>camunda-bpm-spring-boot-starter-webapp</artifactId>
                 <version>${camunda.version}</version>
             </dependency>
-            <!-- JasperReports (cho report-service ở Phase 6) -->
+            <!-- JasperReports-->
             <dependency>
                 <groupId>net.sf.jasperreports</groupId>
                 <artifactId>jasperreports</artifactId>

@@ -2,7 +2,7 @@ import { Component, ChangeDetectorRef, HostListener, inject } from '@angular/cor
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
-import { CartService } from '../../core/services/cart.service';
+import { CartService } from '../../customer/cart/service/cart.service';
 
 @Component({
   selector: 'app-navbar',

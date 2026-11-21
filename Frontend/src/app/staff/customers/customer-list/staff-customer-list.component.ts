@@ -1,18 +1,7 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { StaffCustomersService } from '../customers.service';
-import { Order, ShippingAddress } from '../../../core/models/order.model';
-import { PageResponse } from '../../../core/models/product.model';
-
-export interface CustomerSummary {
-  userId: string;
-  fullName: string;
-  phone: string;
-  address: string;
-  orderCount: number;
-  totalSpent: number;
-  lastOrderAt: string;
-}
+import { ShippingAddress, CustomerSummary } from '../model/customer.model';
+import { StaffCustomersService } from '../service/customers.service';
 
 @Component({
   selector: 'app-staff-customer-list',
@@ -36,14 +25,19 @@ export class StaffCustomerListComponent implements OnInit {
         for (const o of res.content) {
           let addr: ShippingAddress | null = null;
           try {
-            addr = typeof o.shippingAddress === 'string' ? JSON.parse(o.shippingAddress) : o.shippingAddress;
+            addr =
+              typeof o.shippingAddress === 'string'
+                ? JSON.parse(o.shippingAddress)
+                : o.shippingAddress;
           } catch {
             addr = null;
           }
 
           const key = addr?.phone || o.userId;
           const name = addr?.fullName || o.userId || 'Khách hàng';
-          const fullAddress = addr ? [addr.addressLine, addr.ward, addr.district, addr.city].filter(Boolean).join(', ') : 'Chưa cập nhật';
+          const fullAddress = addr
+            ? [addr.addressLine, addr.ward, addr.district, addr.city].filter(Boolean).join(', ')
+            : 'Chưa cập nhật';
 
           if (!map.has(key)) {
             map.set(key, {
@@ -69,7 +63,7 @@ export class StaffCustomerListComponent implements OnInit {
       error: () => {
         this.loading = false;
         this.cdr.markForCheck();
-      }
+      },
     });
   }
 

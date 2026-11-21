@@ -12,13 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Trích xuất realm roles từ JWT của Keycloak (claim "realm_access.roles")
- * và chuyển thành GrantedAuthority với tiền tố "ROLE_". Giúp @PreAuthorize("hasRole('ADMIN')")
- * hoạt động bình thường.
- *
- * Dùng chung cho mọi service dạng resource server (servlet & reactive đều dùng được).
- */
 public class KeycloakRealmRolesConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
     @Override

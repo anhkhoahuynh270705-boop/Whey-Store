@@ -5,9 +5,9 @@ services:
     image: postgres:16-alpine
     container_name: gymstore-postgres
     environment:
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: Khoa123
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./postgres-setup.sql:/docker-entrypoint-initdb.d/init.sql
@@ -156,6 +156,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       postgres:
         condition: service_healthy
@@ -204,6 +205,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       postgres:
         condition: service_healthy
@@ -228,6 +230,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       postgres:
         condition: service_healthy
@@ -252,6 +255,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       postgres:
         condition: service_healthy
@@ -278,6 +282,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       kafka:
         condition: service_healthy
@@ -302,6 +307,7 @@ services:
       - maven_cache:/root/.m2
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      DB_PASSWORD: Khoa123
     depends_on:
       postgres:
         condition: service_healthy

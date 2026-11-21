@@ -8,7 +8,7 @@
     <div class="table-toolbar">
       <span class="toolbar-title">Tất cả đơn hàng</span>
       <div class="toolbar-actions">
-        <select [(ngModel)]="filterStatus" style="max-width: 160px">
+        <select formControlName="filterStatus" style="max-width: 160px">
           <option value="">Tất cả trạng thái</option>
           @for (s of statusOptions.slice(1); track s) {
             <option [value]="s">{{ s }}</option>

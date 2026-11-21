@@ -1,0 +1,43 @@
+/*
+   LAYOUT
+*/
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--sp-lg);
+}
+
+/*
+   ROUTE TRANSITION ANIMATIONS
+*/
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes pageLeave {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Applied to all direct children of router-outlet */
+router-outlet + * {
+  display: block;
+  min-height: calc(100vh - var(--navbar-h));
+  animation: pageEnter 420ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}

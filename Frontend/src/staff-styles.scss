@@ -52,10 +52,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  transition: border-color 200ms ease;
+  transition: transform 200ms ease;
 
   &:hover {
-    border-color: var(--clr-primary);
+    transform: translateY(-2px);
   }
 
   .stat-icon {
@@ -99,7 +99,7 @@
   align-items: center;
   justify-content: center;
   font-size: 0.85rem;
-  transition: background 150ms ease, transform 150ms ease, color 150ms ease;
+  transition: transform 150ms ease;
   text-decoration: none;
 
   &:hover {
@@ -109,25 +109,16 @@
   &.detail {
     background: rgba(13, 148, 136, 0.15);
     color: var(--clr-primary-lt, #2dd4bf);
-    &:hover {
-      background: rgba(13, 148, 136, 0.3);
-    }
   }
 
   &.edit {
     background: rgba(245, 158, 11, 0.15);
     color: var(--clr-warning, #f59e0b);
-    &:hover {
-      background: rgba(245, 158, 11, 0.3);
-    }
   }
 
   &.delete {
     background: rgba(239, 68, 68, 0.15);
     color: var(--clr-danger, #ef4444);
-    &:hover {
-      background: rgba(239, 68, 68, 0.3);
-    }
   }
 }
 

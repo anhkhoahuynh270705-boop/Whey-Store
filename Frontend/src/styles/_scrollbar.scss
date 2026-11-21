@@ -1,0 +1,17 @@
+/*
+   SCROLLBAR
+*/
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--clr-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--clr-border-soft);
+  border-radius: var(--r-pill);
+  &:hover {
+    background: var(--clr-text-muted);
+  }
+}

@@ -15,19 +15,13 @@
     <div class="page-loading"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
   } @else {
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      @if (errorMsg) {
-        <div class="alert alert-error">
-          <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
-        </div>
-      }
-      @if (successMsg) {
-        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
-      }
-
       <div class="form-layout">
+        <!-- ── LEFT COLUMN ──────────────────────────────── -->
         <div class="form-col main-col">
+          <!-- Basic info -->
           <div class="form-card">
             <div class="card-title"><i class="fas fa-info-circle"></i> Thông tin cơ bản</div>
+
             <div class="form-group">
               <label>Tên sản phẩm <span class="req">*</span></label>
               <input
@@ -73,13 +67,13 @@
               <label>Mô tả</label>
               <textarea
                 formControlName="description"
-                rows="5"
-                placeholder="Nhập mô tả chi tiết về sản phẩm..."
+                rows="4"
+                placeholder="Nhập mô tả chi tiết..."
               ></textarea>
             </div>
           </div>
 
-          <!-- Pricing card -->
+          <!-- Pricing -->
           <div class="form-card">
             <div class="card-title"><i class="fas fa-tag"></i> Giá bán</div>
             <div class="form-row">
@@ -102,58 +96,166 @@
             </div>
           </div>
 
-          <!-- Specs card -->
+          <!-- ── VARIANTS ──────────────────────────────── -->
           <div class="form-card">
-            <div class="card-title"><i class="fas fa-flask"></i> Thông số sản phẩm</div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>Khối lượng (g)</label>
-                <input type="number" formControlName="weightGrams" placeholder="VD: 907" min="0" />
-              </div>
-              <div class="form-group">
-                <label>Hương vị</label>
-                <input
-                  type="text"
-                  formControlName="flavor"
-                  placeholder="VD: Chocolate, Vanilla..."
-                />
-              </div>
-              <div class="form-group">
-                <label>Số lần dùng</label>
-                <input type="number" formControlName="servingSize" placeholder="VD: 30" min="0" />
-              </div>
+            <div class="card-title">
+              <i class="fas fa-layer-group"></i> Hương vị &amp; Kích thước
+              <span class="variant-count">{{ variants.length }} biến thể</span>
             </div>
+
+            <p class="variant-hint">
+              Mỗi biến thể là 1 kết hợp hương vị + kích thước (VD: Chocolate 2lbs, Vanilla 5lbs...).
+              Mỗi biến thể có SKU và số lượng tồn kho riêng.
+            </p>
+
+            <div formArrayName="variants">
+              @for (v of variants.controls; track $index; let i = $index) {
+                <div [formGroupName]="i" class="variant-card">
+                  <div class="variant-header">
+                    <span class="variant-index">Biến thể #{{ i + 1 }}</span>
+                    <button
+                      type="button"
+                      class="variant-remove"
+                      (click)="removeVariant(i)"
+                      title="Xoá biến thể"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  <div class="variant-body">
+                    <div class="variant-row">
+                      <div class="form-group">
+                        <label>Hương vị <span class="req">*</span></label>
+                        <input
+                          type="text"
+                          formControlName="flavor"
+                          placeholder="VD: Chocolate, Vanilla, Dâu..."
+                        />
+                        @if (vf(i, 'flavor')?.invalid && vf(i, 'flavor')?.touched) {
+                          <span class="field-error">Nhập tên hương vị</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label>Kích thước / Khối lượng (g) <span class="req">*</span></label>
+                        <input
+                          type="number"
+                          formControlName="weightGrams"
+                          placeholder="VD: 907, 2270, 4536..."
+                          min="1"
+                        />
+                        @if (vf(i, 'weightGrams')?.invalid && vf(i, 'weightGrams')?.touched) {
+                          <span class="field-error">Nhập khối lượng (g)</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label>Số lần dùng (servings)</label>
+                        <input
+                          type="number"
+                          formControlName="servingSize"
+                          placeholder="VD: 30, 75, 150..."
+                          min="1"
+                        />
+                      </div>
+                    </div>
+
+                    <!-- Row 2: SKU + Tồn kho ban đầu -->
+                    <div class="variant-row variant-row-sm">
+                      <div class="form-group">
+                        <label>SKU <span class="req">*</span></label>
+                        <input
+                          type="text"
+                          formControlName="sku"
+                          placeholder="VD: ON-WHEY-CHOC-2LBS"
+                        />
+                        @if (vf(i, 'sku')?.invalid && vf(i, 'sku')?.touched) {
+                          <span class="field-error">Nhập mã SKU</span>
+                        }
+                      </div>
+
+                      <div class="form-group">
+                        <label>Số lượng tồn kho ban đầu <span class="req">*</span></label>
+                        <input type="number" formControlName="stock" placeholder="0" min="0" />
+                        @if (vf(i, 'stock')?.invalid && vf(i, 'stock')?.touched) {
+                          <span class="field-error">Nhập số lượng ≥ 0</span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <button type="button" class="btn-add-variant" (click)="addVariant()">
+              <i class="fas fa-plus"></i> Thêm hương vị / kích thước
+            </button>
           </div>
         </div>
 
-        <!-- Right column -->
+        <!-- ── RIGHT COLUMN ─────────────────────────────── -->
         <div class="form-col side-col">
-          <!-- Status card -->
+          <!-- Status -->
           <div class="form-card">
             <div class="card-title"><i class="fas fa-toggle-on"></i> Trạng thái</div>
             <div class="form-group">
               <select formControlName="status">
-                <option value="ACTIVE">✅ Hoạt động (hiển thị)</option>
-                <option value="INACTIVE">🔴 Ẩn (không hiển thị)</option>
+                <option value="ACTIVE">Hoạt động (hiển thị)</option>
+                <option value="INACTIVE">Ẩn (không hiển thị)</option>
               </select>
             </div>
           </div>
 
-          <!-- Image card -->
+          <!-- Images -->
           <div class="form-card">
-            <div class="card-title"><i class="fas fa-image"></i> Ảnh sản phẩm</div>
-            <div class="form-group">
-              <label>URL ảnh chính</label>
-              <input type="url" formControlName="imageUrl" placeholder="https://..." />
+            <div class="card-title">
+              <i class="fas fa-images"></i> Ảnh sản phẩm
+              <span class="img-count">{{ imageSlots | imgCount }}/4</span>
             </div>
-            @if (f('imageUrl')?.value) {
-              <div class="img-preview">
-                <img [src]="f('imageUrl')?.value" alt="Preview" />
-              </div>
-            }
+            <p class="img-hint">
+              Tối đa 4 ảnh. Ảnh đầu tiên là ảnh chính. Click vào slot để chọn ảnh.
+            </p>
+
+            <div class="img-grid">
+              @for (slot of imageSlots; track $index; let i = $index) {
+                <input
+                  type="file"
+                  accept="image/*"
+                  [id]="'img-input-' + i"
+                  class="img-file-input"
+                  (change)="onFilePicked($event, i)"
+                />
+
+                <div
+                  class="img-slot"
+                  [class.has-img]="slot !== null"
+                  [class.primary-slot]="i === 0"
+                  (click)="triggerFilePick(i)"
+                >
+                  @if (slot !== null) {
+                    <img [src]="slot" class="slot-img" alt="Ảnh {{ i + 1 }}" />
+                    <div class="slot-overlay">
+                      <i class="fas fa-camera"></i><span>Thay ảnh</span>
+                    </div>
+                    <button type="button" class="slot-remove" (click)="removeImage(i, $event)">
+                      <i class="fas fa-times"></i>
+                    </button>
+                    @if (i === 0) {
+                      <span class="primary-badge">Chính</span>
+                    }
+                  } @else {
+                    <div class="slot-empty">
+                      <i class="fas fa-plus"></i>
+                      <span>{{ i === 0 ? 'Ảnh chính' : 'Thêm ảnh' }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
 
-          <!-- Actions card -->
+          <!-- Actions -->
           <div class="form-card action-card">
             <button type="submit" class="btn-submit" [disabled]="loading">
               @if (loading) {

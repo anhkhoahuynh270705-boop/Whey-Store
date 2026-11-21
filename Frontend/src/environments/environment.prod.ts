@@ -1,4 +1,3 @@
-// File này được tự động tạo từ .env bởi scripts/set-env.js
 export const environment = {
   production: true,
   apiUrl: '/api',

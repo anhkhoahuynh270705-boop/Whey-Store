@@ -1,10 +1,12 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { AdminProductsService } from '../products.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { PageResponse, ProductListItem } from '../../../core/models/product.model';
+import { ConfirmDialogService } from '../../../shared/confirm/service/confirm-dialog.service';
+import { PageResponse, ProductListItem } from '../model/product.model';
+import { Subscription, filter } from 'rxjs';
+import { AdminProductsService } from '../service/products.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-admin-product-list',
@@ -13,7 +15,7 @@ import { PageResponse, ProductListItem } from '../../../core/models/product.mode
   templateUrl: './admin-product-list.component.html',
   styleUrl: './admin-product-list.component.scss',
 })
-export class AdminProductListComponent implements OnInit {
+export class AdminProductListComponent implements OnInit, OnDestroy {
   data: PageResponse<ProductListItem> | null = null;
   loading = true;
   search = '';
@@ -21,11 +23,25 @@ export class AdminProductListComponent implements OnInit {
 
   private productsService = inject(AdminProductsService);
   private toast = inject(ToastService);
+  private confirm = inject(ConfirmDialogService);
   private router = inject(Router);
   protected cdr = inject(ChangeDetectorRef);
 
+  private routerSub?: Subscription;
+
   ngOnInit(): void {
     this.load();
+    this.routerSub = this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e: NavigationEnd) => {
+        if (e.urlAfterRedirects === '/products' || e.urlAfterRedirects === '/products/') {
+          this.load();
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
   }
 
   load(): void {
@@ -61,7 +77,7 @@ export class AdminProductListComponent implements OnInit {
     this.productsService.updateProduct(p.id, { status: newStatus } as any).subscribe({
       next: () => {
         this.togglingId = null;
-        this.toast.success(`Đã chuyển sản phẩm sang trạng thái ${newStatus === 'ACTIVE' ? 'Kinh doanh' : 'Ngừng bán'}`);
+        this.toast.success(`Đã chuyển sang ${newStatus === 'ACTIVE' ? 'Kinh doanh' : 'Ngừng bán'}`);
         this.load();
         this.cdr.markForCheck();
       },
@@ -72,8 +88,17 @@ export class AdminProductListComponent implements OnInit {
     });
   }
 
-  deleteProduct(id: number): void {
-    if (!confirm('Xác nhận xoá sản phẩm? Hành động này không thể hoàn tác.')) return;
+  async deleteProduct(id: number): Promise<void> {
+    const ok = await this.confirm.open({
+      title: 'Xoá sản phẩm?',
+      message:
+        'Hành động này không thể hoàn tác. Toàn bộ ảnh và dữ liệu liên quan sẽ bị xoá vĩnh viễn.',
+      confirmLabel: 'Xoá',
+      cancelLabel: 'Giữ lại',
+      variant: 'danger',
+    });
+    if (!ok) return;
+
     this.productsService.deleteProduct(id).subscribe({
       next: () => {
         this.toast.success('Đã xoá sản phẩm thành công!');

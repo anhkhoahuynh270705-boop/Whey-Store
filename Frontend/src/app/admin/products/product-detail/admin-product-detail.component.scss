@@ -1,19 +1,14 @@
-$accent: #6366f1;
-$accent-lt: #818cf8;
-$border: #252830;
-$text: #e8eaf0;
-$muted: #7a7f94;
-$success: #22c55e;
-$danger: #ef4444;
-$warning: #f59e0b;
+﻿.admin-page {
+  padding: 24px 28px;
+}
 
-// ── Page header
 .page-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 14px;
   margin-bottom: 24px;
-  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .header-left {
@@ -23,42 +18,47 @@ $warning: #f59e0b;
 }
 
 .back-btn {
-  width: 36px;
-  height: 36px;
-  background: #1f2128;
-  border: 1px solid $border;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
-  color: $muted;
+  border: 1px solid #22263a;
+  background: transparent;
+  color: #6b7280;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 13px;
   flex-shrink: 0;
   transition:
-    color 0.15s,
-    background 0.15s;
+    color 150ms,
+    transform 150ms;
+
   &:hover {
-    color: $text;
-    background: #252830;
+    color: #e2e6f3;
+    transform: translateX(-2px);
   }
 }
 
 h1 {
-  font-size: 1.3rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  color: $text;
-  margin: 0 0 2px;
+  color: #e2e6f3;
+  margin: 0 0 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   i {
-    color: $accent-lt;
-    margin-right: 8px;
+    color: #818cf8;
   }
 }
 
 .breadcrumb {
-  font-size: 0.78rem;
-  color: $muted;
+  font-size: 11.5px;
+  color: #6b7280;
+
   .crumb-link {
-    color: $accent-lt;
+    color: #818cf8;
     cursor: pointer;
     &:hover {
       text-decoration: underline;
@@ -68,75 +68,81 @@ h1 {
 
 .header-actions {
   display: flex;
-  gap: 10px;
   align-items: center;
+  gap: 8px;
 }
 
 .btn-edit {
-  background: rgba(99, 102, 241, 0.15);
-  color: $accent-lt;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
   border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 0.88rem;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.08);
+  color: #818cf8;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: background 0.15s;
+  transition: transform 150ms;
+
   &:hover {
-    background: rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
   }
 }
 
 .btn-delete {
-  background: rgba(239, 68, 68, 0.1);
-  color: $danger;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
   border-radius: 8px;
-  padding: 8px 16px;
-  font-size: 0.88rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: background 0.15s;
+  transition: transform 150ms;
+
   &:hover {
-    background: rgba(239, 68, 68, 0.25);
+    transform: translateY(-1px);
   }
 }
 
-// ── Loading / alerts ─────────────────────────────────────────
+// ── Loading ───────────────────────────────────────────
 .page-loading {
+  padding: 48px;
   text-align: center;
-  padding: 60px;
-  color: $muted;
-  i {
-    margin-right: 8px;
-  }
+  color: #6b7280;
 }
+
 .alert {
   border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 0.88rem;
+  padding: 11px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 8px;
+
   &.alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
     color: #fca5a5;
   }
 }
 
-// ── Layout ───────────────────────────────────────────────────
+// ── Detail layout ─────────────────────────────────────
 .detail-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 300px 1fr;
   gap: 20px;
   align-items: start;
+
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .detail-col {
@@ -145,38 +151,42 @@ h1 {
   gap: 16px;
 }
 
-// ── Cards ────────────────────────────────────────────────────
+// ── Card ──────────────────────────────────────────────
 .form-card {
-  background: #1a1c23;
-  border: 1px solid $border;
+  background: #13161d;
+  border: 1px solid #22263a;
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px;
 }
 
 .card-title {
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 700;
-  color: $muted;
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.08em;
+  color: #6b7280;
   margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
   i {
-    margin-right: 7px;
-    color: $accent-lt;
+    color: #818cf8;
   }
 }
 
-// ── Images ───────────────────────────────────────────────────
+// ── Images ────────────────────────────────────────────
 .main-image {
   width: 100%;
   aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #1a1d26;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #111318;
-  border-radius: 10px;
-  overflow: hidden;
   margin-bottom: 10px;
+
   img {
     width: 100%;
     height: 100%;
@@ -185,13 +195,8 @@ h1 {
 }
 
 .no-image {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $muted;
-  font-size: 2rem;
+  color: #6b7280;
+  font-size: 2.5rem;
 }
 
 .thumb-row {
@@ -199,26 +204,25 @@ h1 {
   gap: 8px;
   flex-wrap: wrap;
 }
+
 .thumb {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
-  border-radius: 6px;
+  border-radius: 7px;
   border: 2px solid transparent;
   cursor: pointer;
-  transition: border-color 0.15s;
+  transition: transform 150ms;
+
   &.selected {
-    border-color: $accent-lt;
+    border-color: #818cf8;
   }
   &:hover {
-    border-color: rgba(129, 140, 248, 0.5);
+    transform: scale(1.08);
   }
 }
 
-// ── Name card ────────────────────────────────────────────────
-.name-card {
-}
-
+// ── Status + meta ─────────────────────────────────────
 .product-status {
   display: flex;
   align-items: center;
@@ -227,29 +231,14 @@ h1 {
 }
 
 .product-id {
-  font-size: 0.75rem;
-  color: $muted;
-}
-
-.status-badge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 4px 12px;
-  border-radius: 20px;
-  &.active {
-    background: rgba(34, 197, 94, 0.15);
-    color: $success;
-  }
-  &.inactive {
-    background: rgba(239, 68, 68, 0.15);
-    color: $danger;
-  }
+  font-size: 11.5px;
+  color: #6b7280;
 }
 
 .product-name {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  color: $text;
+  color: #e2e6f3;
   margin: 0 0 10px;
   line-height: 1.4;
 }
@@ -259,79 +248,106 @@ h1 {
   flex-wrap: wrap;
   gap: 14px;
 }
+
 .meta-item {
-  font-size: 0.82rem;
-  color: $muted;
+  font-size: 12px;
+  color: #6b7280;
   display: flex;
   align-items: center;
   gap: 5px;
   i {
-    color: $accent-lt;
+    color: #818cf8;
   }
 }
 
-// ── Pricing ──────────────────────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+
+  &.active {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+  &.inactive {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+}
+
+// ── Pricing ───────────────────────────────────────────
 .price-row {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 }
 .price-box {
   flex: 1;
+  min-width: 80px;
 }
 .price-label {
-  font-size: 0.72rem;
-  color: $muted;
+  font-size: 11px;
+  color: #6b7280;
   margin-bottom: 4px;
   text-transform: uppercase;
 }
 .price-value {
   font-size: 1.1rem;
   font-weight: 700;
-  color: $text;
+  color: #e2e6f3;
 }
 .sale-color {
-  color: $warning;
+  color: #f59e0b !important;
 }
 .discount-color {
-  color: $success;
+  color: #10b981 !important;
 }
 
-// ── Spec grid ────────────────────────────────────────────────
+// ── Spec grid ─────────────────────────────────────────
 .spec-grid {
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
+
 .spec-item {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid $border;
+  align-items: center;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(34, 38, 58, 0.7);
+
   &:last-child {
     border-bottom: none;
   }
 }
+
 .spec-label {
-  font-size: 0.82rem;
-  color: $muted;
+  font-size: 12.5px;
+  color: #6b7280;
   display: flex;
   align-items: center;
   gap: 7px;
   i {
-    color: $accent-lt;
+    color: #818cf8;
+    width: 14px;
   }
 }
+
 .spec-value {
-  font-size: 0.88rem;
-  color: $text;
+  font-size: 13px;
+  color: #e2e6f3;
   font-weight: 500;
 }
 
-// ── Description ──────────────────────────────────────────────
+// ── Description ───────────────────────────────────────
 .description-text {
-  font-size: 0.9rem;
-  color: #b0b4c8;
-  line-height: 1.7;
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.75;
   white-space: pre-wrap;
 }

@@ -12,6 +12,6 @@ bootstrapApplication(AdminLayoutComponent, {
   providers: [
     provideRouter(adminRoutes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]), withFetch()),
-    provideAppInitializer(() => inject(AuthService).init()),
+    provideAppInitializer(() => inject(AuthService).init('login-required')),
   ],
 }).catch(err => console.error(err));

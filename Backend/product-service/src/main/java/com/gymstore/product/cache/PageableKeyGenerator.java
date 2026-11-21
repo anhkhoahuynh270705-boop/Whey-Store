@@ -5,10 +5,6 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 
-/**
- * Sinh key cache cho các method nhận ProductFilter + Pageable (toString đã có đủ thông tin).
- * Đảm bảo key phân biệt theo bộ lọc + trang.
- */
 @Component("pageableKeyGenerator")
 public class PageableKeyGenerator implements KeyGenerator {
 

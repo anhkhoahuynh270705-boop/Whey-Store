@@ -1,0 +1,30 @@
+@if (dialog.state(); as s) {
+  <div class="cdialog-backdrop" (click)="dialog.cancel()">
+    <div
+      class="cdialog-card cdialog-card--{{ s.variant ?? 'danger' }}"
+      (click)="$event.stopPropagation()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="s.title"
+    >
+      <div class="cdialog-icon">
+        <i [class]="iconFor(s.variant)"></i>
+      </div>
+
+      <h3 class="cdialog-title">{{ s.title }}</h3>
+      <p class="cdialog-message">{{ s.message }}</p>
+
+      <div class="cdialog-actions">
+        <button class="cdialog-btn cdialog-btn--cancel" (click)="dialog.cancel()">
+          {{ s.cancelLabel ?? 'Huỷ' }}
+        </button>
+        <button
+          class="cdialog-btn cdialog-btn--confirm cdialog-btn--{{ s.variant ?? 'danger' }}"
+          (click)="dialog.confirm()"
+        >
+          {{ s.confirmLabel ?? 'Xác nhận' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

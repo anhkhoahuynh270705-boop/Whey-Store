@@ -48,7 +48,6 @@ public class ProductCacheHelper {
         try {
             locked = lock.tryLock(2, 10, TimeUnit.SECONDS); // wait 2s, lease 10s
             if (!locked) {
-                // Không giành được lock: load thẳng (thà query DB 1 lần còn hơn block)
                 log.debug("Không lấy được lock rebuild cho product {}, load trực tiếp", id);
                 return loader.get().orElse(null);
             }

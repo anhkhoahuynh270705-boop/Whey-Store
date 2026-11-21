@@ -1,5 +1,4 @@
 <div class="admin-page">
-  <!-- Header -->
   <div class="page-header">
     <div class="header-left">
       <button class="back-btn" (click)="cancel()">
@@ -9,8 +8,7 @@
         <h1><i class="fas fa-edit"></i> Chỉnh sửa sản phẩm</h1>
         <span class="breadcrumb">
           <span class="crumb-link" (click)="goList()">Sản phẩm</span>
-          / {{ product?.name ?? '...' }}
-          / Chỉnh sửa
+          / {{ product?.name ?? '...' }} / Chỉnh sửa
         </span>
       </div>
     </div>
@@ -20,22 +18,11 @@
     <div class="page-loading"><i class="fas fa-spinner fa-spin"></i> Đang tải dữ liệu...</div>
   } @else {
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      @if (errorMsg) {
-        <div class="alert alert-error">
-          <i class="fas fa-exclamation-circle"></i> {{ errorMsg }}
-        </div>
-      }
-      @if (successMsg) {
-        <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
-      }
-
       <div class="form-layout">
-        <!-- Left column -->
         <div class="form-col main-col">
           <!-- Basic info -->
           <div class="form-card">
             <div class="card-title"><i class="fas fa-info-circle"></i> Thông tin cơ bản</div>
-
             <div class="form-group">
               <label>Tên sản phẩm <span class="req">*</span></label>
               <input type="text" formControlName="name" placeholder="Tên sản phẩm..." />
@@ -43,7 +30,6 @@
                 <span class="field-error">Tên sản phẩm không được để trống</span>
               }
             </div>
-
             <div class="form-row">
               <div class="form-group">
                 <label>Danh mục <span class="req">*</span></label>
@@ -70,7 +56,6 @@
                 }
               </div>
             </div>
-
             <div class="form-group">
               <label>Mô tả</label>
               <textarea
@@ -124,7 +109,7 @@
           </div>
         </div>
 
-        <!-- Right column -->
+        <!-- ── Right column ────────────────────────── -->
         <div class="form-col side-col">
           <!-- Status -->
           <div class="form-card">
@@ -137,21 +122,61 @@
             </div>
           </div>
 
-          <!-- Image -->
+          <!-- ── Image manager ────────────────────── -->
           <div class="form-card">
-            <div class="card-title"><i class="fas fa-image"></i> Ảnh sản phẩm</div>
-            <div class="form-group">
-              <label>URL ảnh chính</label>
-              <input type="url" formControlName="imageUrl" placeholder="https://..." />
+            <div class="card-title">
+              <i class="fas fa-images"></i> Ảnh sản phẩm
+              <span class="img-count">{{ imageSlots | imgCount }}/4</span>
             </div>
-            @if (f('imageUrl')?.value) {
-              <div class="img-preview">
-                <img [src]="f('imageUrl')?.value" alt="Preview" />
-              </div>
-            }
+            <p class="img-hint">
+              Tối đa 4 ảnh. Ảnh đầu tiên là ảnh chính. Click vào slot để chọn ảnh từ máy.
+            </p>
+
+            <div class="img-grid">
+              @for (slot of imageSlots; track $index; let i = $index) {
+                <input
+                  type="file"
+                  accept="image/*"
+                  [id]="'img-input-' + i"
+                  class="img-file-input"
+                  (change)="onFilePicked($event, i)"
+                />
+
+                <div
+                  class="img-slot"
+                  [class.has-img]="slot !== null"
+                  [class.primary-slot]="i === 0"
+                  (click)="triggerFilePick(i)"
+                >
+                  @if (slot !== null) {
+                    <img [src]="slot.url" class="slot-img" alt="Ảnh {{ i + 1 }}" />
+                    <div class="slot-overlay">
+                      <i class="fas fa-camera"></i>
+                      <span>Thay ảnh</span>
+                    </div>
+                    <button
+                      type="button"
+                      class="slot-remove"
+                      (click)="removeImage(i, $event)"
+                      title="Xoá ảnh"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                    @if (i === 0) {
+                      <span class="primary-badge">Chính</span>
+                    }
+                  } @else {
+                    <div class="slot-empty">
+                      <i class="fas fa-plus"></i>
+                      <span>{{ i === 0 ? 'Ảnh chính' : 'Thêm ảnh' }}</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
           </div>
 
-          <!-- Action card -->
+          <!-- Actions -->
           <div class="form-card action-card">
             <div class="edit-id">ID: #{{ product?.id }}</div>
             <button type="submit" class="btn-submit" [disabled]="saving">

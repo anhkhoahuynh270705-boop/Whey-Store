@@ -48,15 +48,15 @@
         </li>
       } @else {
         <li>
-          <button class="btn btn-sm" (click)="auth.login()">
+          <button class="btn btn-sm" (click)="mobileOpen = false; auth.login()">
             <i class="fas fa-sign-in-alt"></i>
-            Đăng nhập
+            <span>Đăng nhập</span>
           </button>
         </li>
         <li>
-          <button class="btn btn-sm btn-outline" (click)="auth.register()">
+          <button class="btn btn-sm btn-outline" (click)="mobileOpen = false; auth.register()">
             <i class="fas fa-user-plus"></i>
-            Đăng ký
+            <span>Đăng ký</span>
           </button>
         </li>
       }

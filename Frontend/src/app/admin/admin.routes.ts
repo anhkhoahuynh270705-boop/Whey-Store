@@ -9,7 +9,7 @@ export const adminRoutes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () =>
-          import('./dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
+          import('./dashboard/admin-dashboard/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
       },
 
       // Products CRUD
@@ -71,14 +71,14 @@ export const adminRoutes: Routes = [
       {
         path: 'reports',
         loadComponent: () =>
-          import('./reports/admin-reports.component').then((m) => m.AdminReportsComponent),
+          import('./reports-modal/reports/admin-reports.component').then((m) => m.AdminReportsComponent),
       },
 
       // ── Users
       {
         path: 'users',
         loadComponent: () =>
-          import('./users/admin-users.component').then((m) => m.AdminUsersComponent),
+          import('./users-modal/users/admin-users.component').then((m) => m.AdminUsersComponent),
       },
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },

@@ -2,9 +2,6 @@ package com.gymstore.cart.exception.code;
 
 import com.gymstore.cart.exception.IErrorCode;
 
-/**
- * Danh sách mã lỗi của Cart Service (giỏ hàng, cập nhật món hàng, đồng bộ giỏ).
- */
 public enum CartErrorCode implements IErrorCode {
 
     CART_NOT_FOUND("CRT_001", "Giỏ hàng không tồn tại", 404),

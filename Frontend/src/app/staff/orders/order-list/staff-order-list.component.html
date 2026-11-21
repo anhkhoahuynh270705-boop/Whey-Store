@@ -9,9 +9,11 @@
       <span class="toolbar-title">Danh sách đơn</span>
       <div class="toolbar-filter">
         @for (s of statusOptions; track s) {
-          <button class="btn btn-sm"
-                  [class.btn-outline]="filterStatus !== s"
-                  (click)="filterStatus = s">
+          <button
+            class="btn btn-sm"
+            [class.btn-outline]="filterStatus !== s"
+            (click)="filterStatus = s"
+          >
             {{ s || 'Tất cả' }}
           </button>
         }
@@ -27,25 +29,43 @@
     } @else {
       <div class="table-scroll">
         <table class="data-table">
-          <thead><tr>
-            <th>Mã đơn</th>
-            <th class="td-right">Tổng tiền</th>
-            <th class="td-center">Trạng thái</th>
-            <th>Ngày đặt</th>
-            <th>Địa chỉ giao</th>
-            <th class="td-center">Thao tác</th>
-          </tr></thead>
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th class="td-right">Tổng tiền</th>
+              <th class="td-center">Trạng thái</th>
+              <th>Ngày đặt</th>
+              <th>Địa chỉ giao</th>
+              <th class="td-center">Thao tác</th>
+            </tr>
+          </thead>
           <tbody>
             @for (o of filtered; track o.id) {
               <tr>
                 <td class="td-primary">{{ o.orderNumber }}</td>
                 <td class="td-price td-right">{{ formatPrice(o.totalAmount) }}</td>
-                <td class="td-center"><span [class]="statusClass(o.status)">{{ o.status }}</span></td>
+                <td class="td-center">
+                  <span [class]="statusClass(o.status)">{{ o.status }}</span>
+                </td>
                 <td class="td-muted">{{ formatDate(o.createdAt) }}</td>
-                <td class="td-muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.shippingAddress }}</td>
+                <td
+                  class="td-muted"
+                  style="
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  "
+                >
+                  {{ o.shippingAddress }}
+                </td>
                 <td class="td-center">
                   <div class="action-group">
-                    <a [routerLink]="['/orders', o.id]" class="action-btn detail" title="Xem chi tiết">
+                    <a
+                      [routerLink]="['/orders', o.id]"
+                      class="action-btn detail"
+                      title="Xem chi tiết"
+                    >
                       <i class="fas fa-eye"></i>
                     </a>
                   </div>

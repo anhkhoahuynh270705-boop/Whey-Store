@@ -1,21 +1,21 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { AdminOrdersService } from '../orders.service';
-import { Order, PageResponse } from '../../../core/models/order.model';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Order, PageResponse } from '../model/order.model';
+import { AdminOrdersService } from '../service/orders.service';
 
 @Component({
   selector: 'app-admin-order-list',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, ReactiveFormsModule],
   templateUrl: './admin-order-list.component.html',
   styleUrl: './admin-order-list.component.scss',
 })
 export class AdminOrderListComponent implements OnInit {
   data: PageResponse<Order> | null = null;
   loading = true;
-  filterStatus = '';
+  statusControl = new FormControl<string>('', { nonNullable: true });
   private ordersService = inject(AdminOrdersService);
   protected cdr = inject(ChangeDetectorRef);
 
@@ -38,10 +38,11 @@ export class AdminOrderListComponent implements OnInit {
     });
   }
 
-  get filtered(): Order[] {
+   get filtered(): Order[] {
     if (!this.data) return [];
-    if (!this.filterStatus) return this.data.content;
-    return this.data.content.filter((o) => o.status === this.filterStatus);
+    const status = this.statusControl.value;
+    if (!status) return this.data.content;
+    return this.data.content.filter((o) => o.status === status);
   }
 
   formatPrice(p: number): string {

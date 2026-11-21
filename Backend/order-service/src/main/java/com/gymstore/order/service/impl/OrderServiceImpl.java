@@ -96,10 +96,7 @@ public class OrderServiceImpl implements IOrderService {
             order.addItem(item);
         }
 
-        OrderStatusHistory history = new OrderStatusHistory();
-        history.setStatus(OrderStatus.PENDING);
-        history.setNote("Đơn hàng vừa tạo");
-        order.addHistory(history);
+        order.addHistory(mapper.createHistory(OrderStatus.PENDING, "Đơn hàng vừa tạo"));
 
         order = orderRepository.save(order);
         log.info("Tạo đơn {} cho user {}", order.getOrderNumber(), order.getUserId());
@@ -121,10 +118,7 @@ public class OrderServiceImpl implements IOrderService {
             if (req.note() != null) order.setCancelReason(req.note());
         }
 
-        OrderStatusHistory history = new OrderStatusHistory();
-        history.setStatus(newStatus);
-        history.setNote(req.note());
-        order.addHistory(history);
+        order.addHistory(mapper.createHistory(newStatus, req.note()));
 
         order = orderRepository.save(order);
 

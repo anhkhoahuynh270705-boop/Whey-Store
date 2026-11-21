@@ -9,10 +9,10 @@ import {
   Product,
   ProductFilter,
   ProductListItem,
-} from '../models/product.model';
-import { CartDto, CartItemRequest } from '../models/cart.model';
-import { CheckoutRequest, CheckoutResponse, Order } from '../models/order.model';
-import { InventoryItem } from '../models/inventory.model';
+} from '../../customer/products/model/product.model';
+import { CheckoutRequest, CheckoutResponse, Order } from '../../customer/orders/model/order.model';
+import { InventoryItem } from '../../admin/inventory/model/inventory.model';
+import { CartDto, CartItemRequest } from '../../customer/cart/model/cart.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -20,7 +20,7 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  // PRODUCT 
+  // PRODUCT
   getProducts(filter: ProductFilter): Observable<PageResponse<ProductListItem>> {
     let params = new HttpParams();
     if (filter.search) params = params.set('search', filter.search);
@@ -88,7 +88,7 @@ export class ApiService {
     return this.http.delete<void>(`${this.api}/brands/${id}`);
   }
 
-  //  CART 
+  //  CART
   private cartHeaders(guestId?: string): Record<string, string> {
     return guestId ? { 'X-Cart-Id': guestId } : {};
   }
@@ -98,8 +98,9 @@ export class ApiService {
   }
 
   addToCart(item: CartItemRequest, guestId?: string): Observable<CartDto> {
-    return this.http.post<CartDto>(`${this.api}/cart/items`, item,
-      { headers: this.cartHeaders(guestId) });
+    return this.http.post<CartDto>(`${this.api}/cart/items`, item, {
+      headers: this.cartHeaders(guestId),
+    });
   }
 
   updateCartItem(productId: number, quantity: number, guestId?: string): Observable<CartDto> {
@@ -110,13 +111,13 @@ export class ApiService {
   }
 
   removeFromCart(productId: number, guestId?: string): Observable<CartDto> {
-    return this.http.delete<CartDto>(`${this.api}/cart/items/${productId}`,
-      { headers: this.cartHeaders(guestId) });
+    return this.http.delete<CartDto>(`${this.api}/cart/items/${productId}`, {
+      headers: this.cartHeaders(guestId),
+    });
   }
 
   clearCart(guestId?: string): Observable<CartDto> {
-    return this.http.delete<CartDto>(`${this.api}/cart`,
-      { headers: this.cartHeaders(guestId) });
+    return this.http.delete<CartDto>(`${this.api}/cart`, { headers: this.cartHeaders(guestId) });
   }
 
   mergeCart(guestId: string): Observable<CartDto> {
@@ -125,7 +126,7 @@ export class ApiService {
     });
   }
 
-  //  ORDER 
+  //  ORDER
   checkout(request: CheckoutRequest): Observable<CheckoutResponse> {
     return this.http.post<CheckoutResponse>(`${this.api}/orders/checkout`, request);
   }
@@ -148,7 +149,7 @@ export class ApiService {
     return this.http.post<Order>(`${this.api}/orders/${id}/cancel`, null);
   }
 
-  //  INVENTORY 
+  //  INVENTORY
   getInventory(): Observable<InventoryItem[]> {
     return this.http.get<InventoryItem[]>(`${this.api}/inventory`);
   }
@@ -159,7 +160,7 @@ export class ApiService {
     });
   }
 
-  //  REPORTS 
+  //  REPORTS
   downloadInvoice(orderId: number): Observable<Blob> {
     return this.http.get(`${this.api}/reports/invoice/${orderId}`, { responseType: 'blob' });
   }

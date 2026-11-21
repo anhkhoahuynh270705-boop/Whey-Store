@@ -1,1 +1,46 @@
-// inventory view only for staff
+$accent: #10b981;
+$border: #1f2430;
+$surface: #161b26;
+$text: #eef2f8;
+$muted: #6b7f96;
+$danger: #ef4444;
+$warning: #f59e0b;
+
+.staff-page {
+  padding: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  h1 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: $text;
+    margin: 0;
+    i {
+      color: $accent;
+    }
+  }
+}
+
+.stock-level {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  &.low {
+    color: $danger;
+  }
+  &.medium {
+    color: $warning;
+  }
+  &.ok {
+    color: $accent;
+  }
+}

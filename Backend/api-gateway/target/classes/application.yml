@@ -1,6 +1,21 @@
 server:
   port: 8080
 
+keycloak:
+  server-url: ${KEYCLOAK_URL:http://localhost:8090}
+  realm: gymstore
+  client-id: gymstore-frontend
+  admin-realm: master
+  admin-client-id: admin-cli
+  admin-username: admin
+  admin-password: admin
+
+app:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/keycloak_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:Khoa123}
+
 spring:
   application:
     name: api-gateway
@@ -9,7 +24,6 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          # Gateway validate JWT bằng JWKS lấy từ issuer Keycloak
           issuer-uri: ${KEYCLOAK_URL:http://localhost:8090}/realms/gymstore
 
   data:
@@ -27,7 +41,7 @@ spring:
           filters:
             - name: RequestRateLimiter
               args:
-                redis-rate-limiter.replenishRate: 30   # 30 yêu cầu / giây
+                redis-rate-limiter.replenishRate: 30 
                 redis-rate-limiter.burstCapacity: 60
                 redis-rate-limiter.requestedTokens: 1
                 key-resolver: "#{@userOrIpKeyResolver}"
@@ -107,7 +121,7 @@ management:
     health:
       show-details: always
 
-# CORS cho Angular
+# CORS for FE
 cors:
   allowed-origins:
     - http://localhost:4200

@@ -1,13 +1,17 @@
-/* =====================================================
-   ORDER LIST PAGE
-   ===================================================== */
+// ── Component-specific ────────────────────────────────
 .order-list-page {
   padding: var(--sp-xl) 0 var(--sp-2xl);
 }
 
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── Page header ───────────────────────────────────────
 .page-header {
   margin-bottom: var(--sp-xl);
-
   h1 {
     display: flex;
     align-items: center;
@@ -16,7 +20,7 @@
   }
 }
 
-/* ===== EMPTY ===== */
+// ── Empty state ───────────────────────────────────────
 .empty-orders {
   text-align: center;
   padding: var(--sp-2xl);
@@ -25,13 +29,13 @@
   align-items: center;
   gap: var(--sp-md);
   animation: scaleIn 350ms var(--t-bounce) both;
-
   h3 { color: var(--clr-text-soft); }
   p  { color: var(--clr-text-muted); font-size: 14px; }
 }
 
 .empty-icon-wrap {
-  width: 80px; height: 80px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   background: var(--clr-surface-2);
   border: 2px solid var(--clr-border);
@@ -43,13 +47,7 @@
   animation: float 3s ease-in-out infinite;
 }
 
-/* ===== ORDERS LIST ===== */
-.orders-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
+// ── Order row ─────────────────────────────────────────
 .order-row {
   display: flex;
   align-items: center;
@@ -57,16 +55,16 @@
   padding: var(--sp-md) var(--sp-lg);
   flex-wrap: wrap;
   transition: border-color var(--t-fast), box-shadow var(--t-fast), transform var(--t-fast);
-
   &:hover {
-    border-color: rgba(255,107,26,.2);
+    border-color: rgba(255, 107, 26, .2);
     box-shadow: var(--shadow-md);
     transform: translateX(4px);
   }
 }
 
 .order-icon {
-  width: 44px; height: 44px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--r-sm);
   background: rgba(255, 107, 26, 0.1);
   color: var(--clr-primary);
@@ -80,7 +78,6 @@
 .order-meta {
   flex: 1;
   min-width: 160px;
-
   .order-number {
     font-weight: 700;
     font-size: 15px;
@@ -88,7 +85,6 @@
     margin-bottom: 5px;
     i { color: var(--clr-primary); margin-right: 4px; font-size: 12px; }
   }
-
   .order-sub {
     font-size: 12.5px;
     color: var(--clr-text-muted);
@@ -107,8 +103,7 @@
   text-align: right;
 }
 
-/* ===== MOBILE ===== */
 @media (max-width: 600px) {
-  .order-row { gap: var(--sp-sm); }
+  .order-row    { gap: var(--sp-sm); }
   .order-amount { text-align: left; }
 }

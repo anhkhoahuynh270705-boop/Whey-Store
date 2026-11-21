@@ -1,9 +1,9 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { OrdersService } from '../orders.service';
-import { ToastService } from '../../../core/services/toast.service';
-import { Order } from '../../../core/models/order.model';
+import { Order } from '../model/order.model';
+import { OrdersService } from '../service/orders.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-order-detail',

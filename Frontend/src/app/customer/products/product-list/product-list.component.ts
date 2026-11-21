@@ -1,13 +1,17 @@
-import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
+﻿import { Component, ChangeDetectorRef, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { ProductsService } from '../products.service';
-import { CartService } from '../../../core/services/cart.service';
-import { ToastService } from '../../../core/services/toast.service';
 import {
-  Brand, Category, PageResponse, ProductFilter, ProductListItem,
-} from '../../../core/models/product.model';
+  Brand,
+  Category,
+  PageResponse,
+  ProductFilter,
+  ProductListItem,
+} from '../model/product.model';
+import { ProductsService } from '../service/products.service';
+import { CartService } from '../../cart/service/cart.service';
+import { ToastService } from '../../../shared/toast/service/toast.service';
 
 @Component({
   selector: 'app-product-list',
@@ -22,7 +26,7 @@ export class ProductListComponent implements OnInit {
   brands: Brand[] = [];
   loading = false;
   currentPage = 0;
-  
+
   filterForm: FormGroup;
 
   sortOptions = [
@@ -54,17 +58,15 @@ export class ProductListComponent implements OnInit {
       next: (c) => {
         this.categories = c;
         this.cdr.markForCheck();
-      }
+      },
     });
     this.productsService.getBrands().subscribe({
       next: (b) => {
         this.brands = b;
         this.cdr.markForCheck();
-      }
+      },
     });
     this.loadProducts();
-    
-    // Subscribe to form changes for auto-filter
     this.filterForm.valueChanges.subscribe(() => {
       this.onFilterChange();
     });

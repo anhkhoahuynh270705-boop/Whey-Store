@@ -23,7 +23,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (item of items; track item.productId) {
+            @for (item of items; track item.productId; let i = $index) {
               <tr>
                 <td class="td-mono">{{ item.productId }}</td>
                 <td class="td-primary">{{ item.sku }}</td>
@@ -37,11 +37,14 @@
                       type="number"
                       min="1"
                       style="width: 72px"
-                      [ngModel]="deltaMap[item.productId] ?? 0"
-                      (ngModelChange)="deltaMap[item.productId] = $event"
+                      [formControl]="deltas.at(i)"
+                      (keydown.enter)="addStock(i)"
                     />
-                    <button class="btn btn-sm" (click)="addStock(item.productId)">Nhập</button>
+                    <button class="btn btn-sm" (click)="addStock(i)">Nhập</button>
                   </div>
+                  @if (deltas.at(i).touched && deltas.at(i).invalid) {
+                    <small class="text-danger">Nhập số nguyên từ 1 trở lên</small>
+                  }
                 </td>
               </tr>
             }
