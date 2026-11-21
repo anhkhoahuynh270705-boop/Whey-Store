@@ -21,3 +21,10 @@
 # Local secret directories
 secrets/
 **/secrets/
+
+# Local config and Compose files; commit the sanitized examples instead
+Backend/config/*.yml
+!Backend/config/*.example.yml
+Backend/docker-compose.yml
+Backend/docker-compose.dev.yml
+Backend/db-migrations/postgres-setup.sql
