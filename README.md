@@ -194,12 +194,26 @@ Do not commit secrets or real credentials. Default values in the development con
     └── themes/
 ```
 
-## 🤝 Contributing
+## 🧭 Troubleshooting
 
-1. Create a branch for your changes.
-2. Keep each change focused on a specific goal.
-3. Describe your changes clearly in the pull request.
+- **The frontend cannot reach the API:** check `API_URL` in `Frontend/.env` and confirm the API Gateway is running at the configured address.
+- **Sign-in or authorization fails:** make sure Keycloak is available at `KEYCLOAK_URL` and the `gymstore` realm has been imported.
+- **A backend service does not start:** check service health and logs from the `Backend` directory:
 
-## 📄 License
+  ```bash
+  docker compose ps
+  docker compose logs -f <service-name>
+  ```
 
-No license is currently declared in this repository. Add a `LICENSE` file before distributing the project under a specific license.
+- **Environment changes are not reflected:** restart the frontend so its prestart configuration script can regenerate the Angular environment files.
+
+## 🧩 Extending the application
+
+Whey Store is organized by business services rather than a third-party plugin system. When adding a feature, place backend logic in the relevant service, expose endpoints through the API Gateway, and add the corresponding UI to the customer, admin, or staff application. Use Kafka events for workflows that need to notify other services.
+
+## 🔗 Project resources
+
+- [Frontend environment example](Frontend/.env.example)
+- [Backend environment example](Backend/.env.example)
+- [Docker Compose configuration](Backend/docker-compose.yml)
+- [Keycloak realm import](keycloak/imports/gymstore-realm.json)
